@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './user.schema';
 import * as bcrypt from 'bcrypt';
@@ -20,5 +20,11 @@ export class UserService {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
     const user = await this.userModel.create({ ...dto, password });
     return user;
+  }
+
+  async saveRefreshToken(refresh_token: string, userId: Types.ObjectId) {
+    await this.userModel.findByIdAndUpdate(userId, {
+      refreshToken: refresh_token,
+    });
   }
 }

@@ -44,7 +44,7 @@ export class AuthService {
   }
 
   async signup(dto: CreateUserDto) {
-    const user = await this.userService.createUser(dto);
+    const user = await this.userService.create(dto);
     const { accessToken, refreshToken } = await this.getAuthTokens(user);
     await this.userService.saveRefreshToken(refreshToken, user._id);
     return { accessToken, refreshToken };

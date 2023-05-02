@@ -13,10 +13,10 @@ export class UserService {
 
   async getUserByPhoneNumber(phoneNumber: string) {
     const user = await this.userModel.findOne({ phoneNumber });
-    if (!user) throw new UnauthorizedException('phone number not exits');
+    if (!user) throw new UnauthorizedException('phone number not exists');
     return user;
   }
-  async createUser(dto: CreateUserDto) {
+  async create(dto: CreateUserDto) {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
     const user = await this.userModel.create({ ...dto, password });
     return user;

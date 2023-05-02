@@ -12,15 +12,22 @@ import {
   AuthDependingModules,
   AuthDependingServices,
 } from './utils/dependencies';
+import { UserDocument } from 'src/user/user.schema';
 
 describe('AuthService', () => {
   let service: AuthService;
   let module: TestingModule;
-
+  let userService: UserService;
+  let userInfo = {
+    name: 'name',
+    phoneNumber: '01033304427',
+    email: 'email@example.com',
+    password: 'password',
+  };
   beforeAll(async () => {
     module = await Test.createTestingModule({
       imports: [
-        ConfigModule,
+        ConfigModule.forRoot(),
         rootMongooseTestModule(),
         ...AuthDependingModules,
       ],
@@ -29,6 +36,36 @@ describe('AuthService', () => {
     }).compile();
 
     service = module.get<AuthService>(AuthService);
+    userService = module.get<UserService>(UserService);
+  });
+
+  describe('signup', () => {
+    it('should return a token', async () => {
+      const { accessToken, refreshToken } = await service.signup(userInfo);
+      expect(accessToken).toBeDefined();
+      expect(refreshToken).toBeDefined();
+    });
+    it('should throw an error if user already exists', async () => {
+      await expect(service.signup(userInfo)).rejects.toThrow('duplicate');
+    });
+  });
+  describe('login', () => {
+    it('should return a token', async () => {
+      const { accessToken, refreshToken } = await service.login({
+        phoneNumber: userInfo.phoneNumber,
+        password: userInfo.password,
+      });
+      expect(accessToken).toBeDefined();
+      expect(refreshToken).toBeDefined();
+    });
+    it('should throw an error if user does not exist', async () => {
+      await expect(
+        service.login({
+          phoneNumber: '01033304428',
+          password: userInfo.password,
+        }),
+      ).rejects.toThrow('phone number not exists');
+    });
   });
 
   it('should be defined', () => {

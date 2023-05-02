@@ -34,17 +34,21 @@ export class AuthService {
 
   async refreshTheTokens(refresh_token: string) {
     console.log(process.env.JWT_REFRESH_SECRET);
-    const payload = this.jwtService.verify(refresh_token, {
-      secret: process.env.JWT_REFRESH_SECRET,
-    });
-    const user = await this.userService.getUserByPhoneNumber(
-      payload.phoneNumber,
-    );
-    if (user.refreshToken !== refresh_token)
+    try {
+      const payload = this.jwtService.verify(refresh_token, {
+        secret: process.env.JWT_REFRESH_SECRET,
+      });
+      const user = await this.userService.getUserByPhoneNumber(
+        payload.phoneNumber,
+      );
+      if (!user || user.refreshToken !== refresh_token)
+        throw new UnauthorizedException('refresh token not valid');
+      const { accessToken, refreshToken: newRefreshToken } =
+        await this.getAuthTokens(user);
+      return { accessToken, refreshToken: newRefreshToken };
+    } catch (err) {
       throw new UnauthorizedException('refresh token not valid');
-    const { accessToken, refreshToken: newRefreshToken } =
-      await this.getAuthTokens(user);
-    return { accessToken, refreshToken: newRefreshToken };
+    }
   }
 
   async signup(dto: CreateUserDto) {

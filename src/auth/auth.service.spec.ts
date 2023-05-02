@@ -76,6 +76,12 @@ describe('AuthService', () => {
       expect(accessToken).toBeDefined();
       expect(refreshToken).toBeDefined();
     });
+    it('should throw an error if refresh token is not valid', async () => {
+      const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
+      await expect(
+        service.refreshTheTokens('invalid refresh token'),
+      ).rejects.toThrow('refresh token not valid');
+    });
   });
 
   it('should be defined', () => {

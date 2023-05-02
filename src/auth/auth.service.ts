@@ -14,7 +14,11 @@ export class AuthService {
   ) {}
 
   private async getAuthTokens(user: UserDocument) {
-    const payload = { email: user.email, sub: user._id };
+    const payload = {
+      phoneNumber: user.phoneNumber,
+      email: user.email,
+      sub: user._id,
+    };
     return {
       refreshToken: this.jwtService.sign(payload, {
         expiresIn: '20m',

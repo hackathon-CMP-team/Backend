@@ -22,9 +22,7 @@ export class UserService {
     return user;
   }
 
-  async saveRefreshToken(refresh_token: string, userId: Types.ObjectId) {
-    await this.userModel.findByIdAndUpdate(userId, {
-      refreshToken: refresh_token,
-    });
+  async saveRefreshToken(refreshToken: string, userId: Types.ObjectId) {
+    await this.userModel.findByIdAndUpdate(userId, { refreshToken });
   }
 }

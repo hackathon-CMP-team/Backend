@@ -5,6 +5,7 @@ import { User, UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
+import { promisify } from 'util';
 
 @Injectable()
 export class AuthService {
@@ -20,11 +21,11 @@ export class AuthService {
       sub: user._id,
     };
     return {
-      refreshToken: this.jwtService.sign(payload, {
+      accessToken: this.jwtService.sign(payload, {
         expiresIn: '20m',
         secret: process.env.JWT_ACCESS_SECRET,
       }),
-      accessToken: this.jwtService.sign(payload, {
+      refreshToken: this.jwtService.sign(payload, {
         expiresIn: '15d',
         secret: process.env.JWT_REFRESH_SECRET,
       }),
@@ -32,10 +33,13 @@ export class AuthService {
   }
 
   async refreshTheTokens(refresh_token: string) {
+    console.log(process.env.JWT_REFRESH_SECRET);
     const payload = this.jwtService.verify(refresh_token, {
       secret: process.env.JWT_REFRESH_SECRET,
     });
-    const user = await this.userService.getUserByPhoneNumber(payload.email);
+    const user = await this.userService.getUserByPhoneNumber(
+      payload.phoneNumber,
+    );
     if (user.refreshToken !== refresh_token)
       throw new UnauthorizedException('refresh token not valid');
     const { accessToken, refreshToken: newRefreshToken } =

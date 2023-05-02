@@ -67,6 +67,16 @@ describe('AuthService', () => {
       ).rejects.toThrow('phone number not exists');
     });
   });
+  describe('refreshTheTokens', () => {
+    it('should return a token', async () => {
+      const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
+      const { accessToken, refreshToken } = await service.refreshTheTokens(
+        user.refreshToken,
+      );
+      expect(accessToken).toBeDefined();
+      expect(refreshToken).toBeDefined();
+    });
+  });
 
   it('should be defined', () => {
     expect(service).toBeDefined();

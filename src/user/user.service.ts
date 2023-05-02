@@ -23,6 +23,9 @@ export class UserService {
   }
 
   async saveRefreshToken(refreshToken: string, userId: Types.ObjectId) {
-    await this.userModel.findByIdAndUpdate(userId, { refreshToken });
+    const res = await this.userModel.findByIdAndUpdate(userId, {
+      refreshToken,
+    });
+    if (!res) throw new UnauthorizedException('user not exists');
   }
 }

@@ -60,22 +60,6 @@ describe('UserService', () => {
     });
   });
 
-  describe('save refresh token', () => {
-    it('should save refresh token', async () => {
-      const user = await service.getUserByPhoneNumber(userInfo.phoneNumber);
-      expect(user.refreshToken).toBeFalsy();
-      await service.saveRefreshToken('token', user._id);
-      const updatedUser = await service.getUserByPhoneNumber(
-        userInfo.phoneNumber,
-      );
-      expect(updatedUser.refreshToken).toBe('token');
-    });
-    it('should throw error if user not found', async () => {
-      await expect(
-        service.saveRefreshToken('token', new Types.ObjectId(1)),
-      ).rejects.toThrow('not exists');
-    });
-  });
   it('should be defined', () => {
     expect(service).toBeDefined();
   });

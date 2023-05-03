@@ -13,6 +13,7 @@ import {
   AuthDependingServices,
 } from './utils/dependencies';
 import { UserDocument } from 'src/user/user.schema';
+import { Types } from 'mongoose';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -41,22 +42,32 @@ describe('AuthService', () => {
 
   describe('signup', () => {
     it('should return a token', async () => {
-      const { accessToken, refreshToken } = await service.signup(userInfo);
+      const { accessToken } = await service.signup(userInfo);
       expect(accessToken).toBeDefined();
-      expect(refreshToken).toBeDefined();
     });
     it('should throw an error if user already exists', async () => {
       await expect(service.signup(userInfo)).rejects.toThrow('duplicate');
     });
+    afterAll(async () => {
+      const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
+      await service.logout(user._id);
+    });
   });
   describe('login', () => {
     it('should return a token', async () => {
-      const { accessToken, refreshToken } = await service.login({
+      const { accessToken } = await service.login({
         phoneNumber: userInfo.phoneNumber,
         password: userInfo.password,
       });
       expect(accessToken).toBeDefined();
-      expect(refreshToken).toBeDefined();
+    });
+    it('must throw error because user is signed in', async () => {
+      await expect(
+        service.login({
+          phoneNumber: userInfo.phoneNumber,
+          password: userInfo.password,
+        }),
+      ).rejects.toThrow('user already logged in');
     });
     it('should throw an error if user does not exist', async () => {
       await expect(
@@ -67,20 +78,11 @@ describe('AuthService', () => {
       ).rejects.toThrow('phone number not exists');
     });
   });
-  describe('refreshTheTokens', () => {
-    it('should return a token', async () => {
+  describe('logout', () => {
+    it('must logout successfully', async () => {
       const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
-      const { accessToken, refreshToken } = await service.refreshTheTokens(
-        user.refreshToken,
-      );
-      expect(accessToken).toBeDefined();
-      expect(refreshToken).toBeDefined();
-    });
-    it('should throw an error if refresh token is not valid', async () => {
-      const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
-      await expect(
-        service.refreshTheTokens('invalid refresh token'),
-      ).rejects.toThrow('refresh token not valid');
+      const res = await service.logout(user._id);
+      expect(res).toEqual({ status: 'success' });
     });
   });
 

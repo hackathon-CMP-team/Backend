@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 export type UserDocument = User & Document;
 import * as bcrypt from 'bcrypt';
 @Schema()
@@ -17,7 +17,11 @@ export class User {
   password: string;
 
   @Prop({ default: null })
-  refreshToken: string;
+  accessToken: string;
+
+  // add 20 minitues to current time
+  @Prop({ default: () => Date.now() + 20 * 60 * 1000 })
+  accessTokenWillExpireAt: number;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.comparePassword = async function (hashPassword: string) {

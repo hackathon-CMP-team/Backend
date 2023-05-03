@@ -22,9 +22,10 @@ export class UserService {
     return user;
   }
 
-  async saveRefreshToken(refreshToken: string, userId: Types.ObjectId) {
+  async saveAcessToken(accessToken: string | null, userId: Types.ObjectId) {
     const res = await this.userModel.findByIdAndUpdate(userId, {
-      refreshToken,
+      accessToken,
+      accessTokenWillExpireAt: Date.now() + 20 * 60 * 1000,
     });
     if (!res) throw new UnauthorizedException('user not exists');
   }

@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ghcr.io/${{ secrets.AzureAppService_ContainerUsername_8140297c8fe242b7adc197c967753022 }}/hackathon-cmp-team/backend:${{ github.sha }}
+        tags: ghcr.io/hackathon-cmp-team/backend:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:

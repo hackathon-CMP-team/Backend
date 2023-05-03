@@ -2,7 +2,7 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './user.schema';
+import { User, UserDocument } from './user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -28,5 +28,9 @@ export class UserService {
       accessTokenWillExpireAt: Date.now() + 20 * 60 * 1000,
     });
     if (!res) throw new UnauthorizedException('user not exists');
+  }
+
+  getUserBalance(user: UserDocument) {
+    return { balance: user.balance };
   }
 }

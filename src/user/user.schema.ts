@@ -22,6 +22,9 @@ export class User {
   // add 20 minitues to current time
   @Prop({ default: () => Date.now() + 20 * 60 * 1000 })
   accessTokenWillExpireAt: number;
+
+  @Prop({ default: 0 })
+  balance: number;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.comparePassword = async function (hashPassword: string) {

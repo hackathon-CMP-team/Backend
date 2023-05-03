@@ -24,7 +24,7 @@ jobs:
       with:
         registry: https://tabcashregistry.azurecr.io/
         username: ${{ secrets.AzureAppService_ContainerUsername_e9f966f0b91f4b25a13fd66a0f0d8404 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_d99ddd827acf48dea82295b76b892b05 }}
+        password: ${{ secrets.Adeployment_access_token }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2

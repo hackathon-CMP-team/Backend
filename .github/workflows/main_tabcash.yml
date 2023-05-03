@@ -23,14 +23,14 @@ jobs:
       uses: docker/login-action@v1
       with:
         registry: https://ghcr.io/
-        username: ${{ secrets.AzureAppService_ContainerUsername_9f324bde1b734cbdace97afd9ec41407 }}
-        password: ${{ secrets.AzureAppService_ContainerPassword_f4666f57d18d4c249bb0137216eb28b0 }}
+        username: ${{ secrets.AzureAppService_ContainerUsername_8140297c8fe242b7adc197c967753022 }}
+        password: ${{ secrets.AzureAppService_ContainerPassword_b3e71fd6eba74f439a4395f190502f23 }}
 
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: ghcr.io/${{ secrets.AzureAppService_ContainerUsername_9f324bde1b734cbdace97afd9ec41407 }}/mcr.microsoft.com/appsvc/staticsite:${{ github.sha }}
+        tags: ghcr.io/${{ secrets.AzureAppService_ContainerUsername_8140297c8fe242b7adc197c967753022 }}/hackathon-cmp-team/backend:${{ github.sha }}
         file: ./Dockerfile
 
   deploy:
@@ -47,5 +47,5 @@ jobs:
       with:
         app-name: 'tabcash'
         slot-name: 'production'
-        publish-profile: ${{ secrets.AzureAppService_PublishProfile_cedfc0e4c88b4e04b073d473e34aec75 }}
-        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_9f324bde1b734cbdace97afd9ec41407 }}/mcr.microsoft.com/appsvc/staticsite:${{ github.sha }}'
+        publish-profile: ${{ secrets.AzureAppService_PublishProfile_146002f1b49649368a8082464f9c7761 }}
+        images: 'ghcr.io/${{ secrets.AzureAppService_ContainerUsername_8140297c8fe242b7adc197c967753022 }}/hackathon-cmp-team/backend:${{ github.sha }}'

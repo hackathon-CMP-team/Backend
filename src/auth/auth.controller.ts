@@ -1,7 +1,9 @@
-import { Body, Controller, Post } from '@nestjs/common';
+import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
+import { Types } from 'mongoose';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { JWTUserGuard } from './guards/user.guard';
 
 @Controller('auth')
 export class AuthController {
@@ -12,13 +14,15 @@ export class AuthController {
     return this.authService.signup(dto);
   }
 
-  @Post('/refresh')
-  refresh(@Body('refresh_token') refresh_token: string) {
-    return this.authService.refreshTheTokens(refresh_token);
-  }
-
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
+  }
+
+  @Post('logout')
+  @UseGuards(JWTUserGuard)
+  logout(@Req() req: any) {
+    console.log(req.user);
+    return this.authService.logout(req.user._id);
   }
 }

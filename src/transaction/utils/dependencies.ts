@@ -1,16 +1,45 @@
-import { JwtModule, JwtService } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModule } from '../../user/user.module';
 import { User, UserSchema } from '../../user/user.schema';
 import { UserService } from '../../user/user.service';
-import { AuthController } from '../../auth/auth.controller';
-import { AuthService } from '../../auth/auth.service';
 import { TransactionController } from '../transaction.controller';
 import { TransactionService } from '../transaction.service';
+import { Transaction } from 'mongodb';
+import {
+  TransactionSchema,
+  TransactionTransfer,
+  TransactionTransferSchema,
+  TransactionVirtualVisa,
+  TransactionVirtualVisaSchema,
+  TransactionWithdraw,
+  TransactionWithdrawSchema,
+} from '../transaction.schema';
 
-export const UserDependingModules = [
-  MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
+export const TransacionDependingModules = [
+  MongooseModule.forFeature([
+    {
+      name: User.name,
+      schema: UserSchema,
+    },
+    {
+      name: Transaction.name,
+      schema: TransactionSchema,
+      discriminators: [
+        {
+          name: TransactionTransfer.name,
+          schema: TransactionTransferSchema,
+        },
+        {
+          name: TransactionWithdraw.name,
+          schema: TransactionWithdrawSchema,
+        },
+        {
+          name: TransactionVirtualVisa.name,
+          schema: TransactionVirtualVisaSchema,
+        },
+      ],
+    },
+  ]),
 ];
 
-export const UserDependingControllers = [TransactionController];
-export const UserDependingServices = [TransactionService, UserService];
+export const TransacionDependingControllers = [TransactionController];
+export const TransactionDependingServices = [TransactionService, UserService];

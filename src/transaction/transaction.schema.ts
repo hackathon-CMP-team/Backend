@@ -16,12 +16,12 @@ export class Transaction {
   userId: Types.ObjectId;
 }
 
-export class TransictionTransfer extends Transaction {
+export class TransactionTransfer extends Transaction {
   @Prop({ required: true })
   to: Types.ObjectId;
 }
 
-export class TransictionVirtualVisa extends Transaction {
+export class TransactionVirtualVisa extends Transaction {
   @Prop({ required: true })
   cardNumber: string;
 
@@ -29,13 +29,13 @@ export class TransictionVirtualVisa extends Transaction {
   cvv: number;
 }
 
-export class TransictionWithdraw extends Transaction {}
+export class TransactionWithdraw extends Transaction {}
 
-export const TransactionScheme = SchemaFactory.createForClass(Transaction);
-export const TransictionTransferScheme =
-  SchemaFactory.createForClass(TransictionTransfer);
-export const TransictionVirtualVisaScheme = SchemaFactory.createForClass(
-  TransictionVirtualVisa,
+export const TransactionSchema = SchemaFactory.createForClass(Transaction);
+export const TransactionTransferSchema =
+  SchemaFactory.createForClass(TransactionTransfer);
+export const TransactionVirtualVisaSchema = SchemaFactory.createForClass(
+  TransactionVirtualVisa,
 );
-export const TransictionWithdrawScheme =
-  SchemaFactory.createForClass(TransictionWithdraw);
+export const TransactionWithdrawSchema =
+  SchemaFactory.createForClass(TransactionWithdraw);

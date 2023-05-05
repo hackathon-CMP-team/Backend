@@ -1,7 +1,8 @@
 version: '3'
 services:
   backend:
-    image: backend
+    image: backend:latest
+    container_name: backend
     volumes:
       - ./server/.env:/app/.env
     ports:

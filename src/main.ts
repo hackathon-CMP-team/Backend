@@ -12,8 +12,8 @@ async function bootstrap() {
     .addTag('cash-tab')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('api', app, document);
-  app.setGlobalPrefix('api');
+  SwaggerModule.setup('ahmed', app, document);
+  app.setGlobalPrefix('ahmed');
   await app.listen(3000);
 }
 bootstrap();

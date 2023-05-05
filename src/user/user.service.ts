@@ -1,4 +1,9 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -32,5 +37,52 @@ export class UserService {
 
   getUserBalance(user: UserDocument) {
     return { balance: user.balance };
+  }
+
+  async moveBalance(
+    senderPhone: string,
+    receiverPhone: string,
+    ammount: number,
+  ) {
+    // find user with senderPhoneNumber or reciever phoneNumber
+    try {
+      const [sender, reciever] = await Promise.all([
+        this.userModel.findOne({ phoneNumber: senderPhone }),
+        this.userModel.findOne({ phoneNumber: receiverPhone }),
+      ]);
+      if (!reciever) {
+        throw new NotFoundException(
+          "wrong phone number, reciever doesn't exist",
+        );
+      }
+      if (sender.balance < ammount) {
+        throw new NotFoundException('not enugh balance to do the operation');
+      }
+      const res = await Promise.all([
+        this.userModel.findByIdAndUpdate(sender._id, {
+          $inc: { balance: -ammount },
+        }),
+        this.userModel.findByIdAndUpdate(reciever._id, {
+          $inc: { balance: ammount },
+        }),
+      ]);
+      if (res[0] === null && res[1] === null) {
+        throw new BadRequestException('transaciton failed!');
+      }
+      if (res[0] === null) {
+        await this.userModel.findByIdAndUpdate(reciever._id, {
+          $inc: { balance: -ammount },
+        });
+        throw new BadRequestException('transaciton failed!');
+      }
+      if (res[1] === null) {
+        await this.userModel.findByIdAndUpdate(sender._id, {
+          $inc: { balance: ammount },
+        });
+        throw new BadRequestException('transaciton failed!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

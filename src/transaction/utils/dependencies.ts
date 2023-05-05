@@ -3,8 +3,8 @@ import { User, UserSchema } from '../../user/user.schema';
 import { UserService } from '../../user/user.service';
 import { TransactionController } from '../transaction.controller';
 import { TransactionService } from '../transaction.service';
-import { Transaction } from 'mongodb';
 import {
+  Transaction,
   TransactionSchema,
   TransactionTransfer,
   TransactionTransferSchema,
@@ -13,8 +13,9 @@ import {
   TransactionWithdraw,
   TransactionWithdrawSchema,
 } from '../transaction.schema';
+import { JwtService } from '@nestjs/jwt';
 
-export const TransacionDependingModules = [
+export const TransactionDependingModules = [
   MongooseModule.forFeature([
     {
       name: User.name,
@@ -41,5 +42,9 @@ export const TransacionDependingModules = [
   ]),
 ];
 
-export const TransacionDependingControllers = [TransactionController];
-export const TransactionDependingServices = [TransactionService, UserService];
+export const TransactionDependingControllers = [TransactionController];
+export const TransactionDependingServices = [
+  TransactionService,
+  UserService,
+  JwtService,
+];

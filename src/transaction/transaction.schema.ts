@@ -1,9 +1,8 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 
-@Schema()
+@Schema({ discriminatorKey: 'type' })
 export class Transaction {
-  @Prop({ required: true, enum: ['withdraw', 'transfer', 'virtual visa'] })
   type: string;
 
   @Prop({ required: true })
@@ -13,14 +12,16 @@ export class Transaction {
   date: Date;
 
   @Prop({ required: true })
-  userId: Types.ObjectId;
+  userPhone: string;
 }
 
+@Schema()
 export class TransactionTransfer extends Transaction {
   @Prop({ required: true })
-  to: Types.ObjectId;
+  receiverPhone: string;
 }
 
+@Schema()
 export class TransactionVirtualVisa extends Transaction {
   @Prop({ required: true })
   cardNumber: string;
@@ -29,6 +30,7 @@ export class TransactionVirtualVisa extends Transaction {
   cvv: number;
 }
 
+@Schema()
 export class TransactionWithdraw extends Transaction {}
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);

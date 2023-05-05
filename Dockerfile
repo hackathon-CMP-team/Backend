@@ -16,7 +16,5 @@ COPY . .
 # Expose the port on which the application listens
 EXPOSE 3000
 
-# This is file is to test the devops pipeline only, i will delete it again.
-
 # Start the application
 CMD ["npm", "run", "start:dev"]

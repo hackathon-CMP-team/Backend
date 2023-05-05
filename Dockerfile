@@ -16,5 +16,7 @@ COPY . .
 # Expose the port on which the application listens
 EXPOSE 3000
 
+# This is test for the Jenkins pipeline for CI/CD. I will remove it again.
+
 # Start the application
 CMD ["npm", "run", "start:dev"]

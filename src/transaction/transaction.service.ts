@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { UserService } from 'src/user/user.service';
+import { Model } from 'mongoose';
+import { UserService } from '../user/user.service';
 import { VirtualCardDto } from './dto/virtual-card.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import {
@@ -44,8 +44,6 @@ export class TransactionService {
     return { status: 'success' };
   }
 
-  // card is a 16 digit number
-  // it must be unique and random
   private generateCardNumber() {
     let cardNumber = '';
     for (let i = 0; i < 4; i++) {
@@ -64,7 +62,7 @@ export class TransactionService {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     const cardNumber = this.generateCardNumber();
     const cvv = this.generateCVV();
-    this.transactionVirtualVisaModel.create({
+    await this.transactionVirtualVisaModel.create({
       userPhone: phoneNumber,
       cardNumber,
       cvv,
@@ -81,9 +79,53 @@ export class TransactionService {
       amount: dto.amount,
       date: Date.now(),
     });
+
     return { status: 'success' };
   }
+  async getIncome(phoneNumber: string): Promise<number> {
+    const res = await this.transactionTransferModel.aggregate([
+      {
+        $match: {
+          receiverPhone: phoneNumber,
+        },
+      },
+      {
+        $group: {
+          _id: 0,
+          total: { $sum: '$amount' },
+        },
+      },
+    ]);
+    return res.length ? res[0].total : 0;
+  }
 
+  async getOutcome(phoneNumber: string) {
+    const res = await this.transactionModel.aggregate([
+      {
+        $match: {
+          userPhone: phoneNumber,
+        },
+      },
+      {
+        $project: {
+          amount: {
+            $cond: {
+              if: { $eq: ['$type', TransactionVirtualVisa.name] },
+              then: '$usedAmount',
+              else: '$amount',
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: 1,
+          totalOutcome: { $sum: '$amount' },
+        },
+      },
+    ]);
+    return res.length ? res[0].totalOutcome : 0;
+  }
   getUserTransactions(phoneNumber: string) {
     return this.transactionModel
       .find({
@@ -105,7 +147,7 @@ export class TransactionService {
         .find({
           userPhone: phoneNumber,
           unusedMoneyReturned: false,
-          // visaWillExpireAt: { $lte: Date.now() },
+          visaWillExpireAt: { $lte: Date.now() },
         })
         .select({
           amount: 1,

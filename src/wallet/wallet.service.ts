@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { TransactionService } from 'src/transaction/transaction.service';
-import { UserService } from 'src/user/user.service';
+import { TransactionService } from '../transaction/transaction.service';
+import { UserService } from '../user/user.service';
 
 @Injectable()
 export class WalletService {
@@ -14,7 +14,16 @@ export class WalletService {
       this.transactionService.getReturnedBalance(phoneNumber),
     ]);
     return {
-      balance: userBalance + unusedBalance,
+      total: userBalance + unusedBalance,
     };
+  }
+  async getIncome(phoneNumber: any): Promise<any> {
+    const totalIncome = await this.transactionService.getIncome(phoneNumber);
+    return { total: totalIncome };
+  }
+
+  async getOutcome(phoneNumber: any): Promise<any> {
+    const totalOutcome = await this.transactionService.getOutcome(phoneNumber);
+    return { total: totalOutcome };
   }
 }

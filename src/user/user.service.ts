@@ -45,7 +45,7 @@ export class UserService {
   async reduceBalance(phoneNumber: string, ammount: number) {
     const user = await this.getUserByPhoneNumber(phoneNumber);
     if (user.balance < ammount)
-      throw new BadRequestException('not enugh balance to do the operation');
+      throw new BadRequestException('not enough balance to do the operation');
     const updatedUser = await this.userModel.findByIdAndUpdate(
       user._id,
       {
@@ -61,7 +61,7 @@ export class UserService {
         },
         { new: true },
       );
-      throw new BadRequestException('not enugh balance to do the operation');
+      throw new BadRequestException('not enough balance to do the operation');
     }
   }
   async moveBalance(
@@ -70,39 +70,35 @@ export class UserService {
     ammount: number,
   ) {
     // find user with senderPhoneNumber or reciever phoneNumber
-    try {
-      const [sender, reciever] = await Promise.all([
-        this.getUserByPhoneNumber(senderPhone),
-        this.getUserByPhoneNumber(receiverPhone),
-      ]);
-      if (sender.balance < ammount) {
-        throw new BadRequestException('not enugh balance to do the operation');
-      }
-      const res = await Promise.all([
-        this.userModel.findByIdAndUpdate(sender._id, {
-          $inc: { balance: -ammount },
-        }),
-        this.userModel.findByIdAndUpdate(reciever._id, {
-          $inc: { balance: ammount },
-        }),
-      ]);
-      if (res[0] === null && res[1] === null) {
-        throw new BadRequestException('transaciton failed!');
-      }
-      if (res[0] === null) {
-        await this.userModel.findByIdAndUpdate(reciever._id, {
-          $inc: { balance: -ammount },
-        });
-        throw new BadRequestException('transaciton failed!');
-      }
-      if (res[1] === null) {
-        await this.userModel.findByIdAndUpdate(sender._id, {
-          $inc: { balance: ammount },
-        });
-        throw new BadRequestException('transaciton failed!');
-      }
-    } catch (err) {
-      console.log(err);
+    const [sender, reciever] = await Promise.all([
+      this.getUserByPhoneNumber(senderPhone),
+      this.getUserByPhoneNumber(receiverPhone),
+    ]);
+    if (sender.balance < ammount) {
+      throw new BadRequestException('not enough balance to do the operation');
+    }
+    const res = await Promise.all([
+      this.userModel.findByIdAndUpdate(sender._id, {
+        $inc: { balance: -ammount },
+      }),
+      this.userModel.findByIdAndUpdate(reciever._id, {
+        $inc: { balance: ammount },
+      }),
+    ]);
+    if (res[0] === null && res[1] === null) {
+      throw new BadRequestException('transaciton failed!');
+    }
+    if (res[0] === null) {
+      await this.userModel.findByIdAndUpdate(reciever._id, {
+        $inc: { balance: -ammount },
+      });
+      throw new BadRequestException('transaciton failed!');
+    }
+    if (res[1] === null) {
+      await this.userModel.findByIdAndUpdate(sender._id, {
+        $inc: { balance: ammount },
+      });
+      throw new BadRequestException('transaciton failed!');
     }
   }
 }

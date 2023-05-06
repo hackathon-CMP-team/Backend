@@ -35,8 +35,11 @@ export class UserService {
     if (!res) throw new UnauthorizedException('user not exists');
   }
 
-  getUserBalance(user: UserDocument) {
-    return { balance: user.balance };
+  async getUserBalance(phoneNumber: string) {
+    const user = await this.userModel.findOne({ phoneNumber }).select({
+      balance: 1,
+    });
+    return user.balance;
   }
 
   async reduceBalance(phoneNumber: string, ammount: number) {

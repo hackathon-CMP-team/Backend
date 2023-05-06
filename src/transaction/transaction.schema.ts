@@ -29,8 +29,17 @@ export class TransactionVirtualVisa extends Transaction {
   @Prop({ required: true })
   cvv: number;
 
+  @Prop({ default: 0 })
+  usedAmount: number;
+
+  @Prop({ default: null })
+  usedAt: Date;
+
   @Prop({ default: false })
-  cardUsed: boolean;
+  unusedMoneyReturned: boolean;
+
+  @Prop({ default: () => Date.now() + 24 * 60 * 60 * 1000 })
+  visaWillExpireAt: number;
 }
 
 @Schema()

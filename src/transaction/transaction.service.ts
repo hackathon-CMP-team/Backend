@@ -91,6 +91,24 @@ export class TransactionService {
         date: 1,
         userPhone: 1,
         receiverPhone: 1,
+        usedAmount: 1,
+        usedAt: 1,
       });
+  }
+  async getReturnedBalance(phoneNumber: string): Promise<number> {
+    const res = await this.transactionVirtualVisaModel.aggregate([
+      {
+        $match: {
+          userPhone: phoneNumber,
+          // unusedMoneyReturned: { $ne: true },
+          
+          date: {
+            $lt: ['$date', Date.now() - 1 * 60 * 60 * 1000],
+          },
+        },
+      },
+    ]);
+    console.log(res);
+    return 10;
   }
 }

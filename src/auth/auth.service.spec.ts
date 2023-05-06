@@ -1,5 +1,4 @@
 import { ConfigModule } from '@nestjs/config';
-import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
 import {
   closeInMongodConnection,
@@ -12,8 +11,6 @@ import {
   AuthDependingModules,
   AuthDependingServices,
 } from './utils/dependencies';
-import { UserDocument } from 'src/user/user.schema';
-import { Types } from 'mongoose';
 
 describe('AuthService', () => {
   let service: AuthService;

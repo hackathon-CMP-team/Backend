@@ -4,8 +4,8 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, Types } from 'mongoose';
-import { UserService } from 'src/user/user.service';
+import { Model } from 'mongoose';
+import { UserService } from '../user/user.service';
 import { VirtualCardDto } from './dto/virtual-card.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import {

@@ -7,7 +7,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JWTUserGuard } from 'src/auth/guards/user.guard';
+import { JWTUserGuard } from '../auth/guards/user.guard';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';

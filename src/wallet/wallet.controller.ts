@@ -1,5 +1,5 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { JWTUserGuard } from 'src/auth/guards/user.guard';
+import { JWTUserGuard } from '../auth/guards/user.guard';
 import { WalletService } from './wallet.service';
 import {
   ApiTags,

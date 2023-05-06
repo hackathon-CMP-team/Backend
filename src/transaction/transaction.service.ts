@@ -62,7 +62,7 @@ export class TransactionService {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     const cardNumber = this.generateCardNumber();
     const cvv = this.generateCVV();
-    this.transactionVirtualVisaModel.create({
+    await this.transactionVirtualVisaModel.create({
       userPhone: phoneNumber,
       cardNumber,
       cvv,

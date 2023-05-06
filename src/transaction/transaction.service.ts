@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserService } from 'src/user/user.service';
@@ -96,19 +100,33 @@ export class TransactionService {
       });
   }
   async getReturnedBalance(phoneNumber: string): Promise<number> {
-    const res = await this.transactionVirtualVisaModel.aggregate([
-      {
-        $match: {
+    try {
+      const res = await this.transactionVirtualVisaModel
+        .find({
           userPhone: phoneNumber,
-          // unusedMoneyReturned: { $ne: true },
-          
-          date: {
-            $lt: ['$date', Date.now() - 1 * 60 * 60 * 1000],
-          },
-        },
-      },
-    ]);
-    console.log(res);
-    return 10;
+          unusedMoneyReturned: false,
+          // visaWillExpireAt: { $lte: Date.now() },
+        })
+        .select({
+          amount: 1,
+          usedAmount: 1,
+          type: 0,
+        });
+      const returnedAmount = res.reduce(
+        (acc, cur) => acc + cur.amount - cur.usedAmount,
+        0,
+      );
+      const ids = res.map((transaction) => transaction._id);
+      await this.userService.reduceBalance(phoneNumber, -returnedAmount);
+      await this.transactionVirtualVisaModel.updateMany(
+        { _id: { $in: ids } },
+        { unusedMoneyReturned: true },
+      );
+      return returnedAmount;
+    } catch (err) {
+      throw new InternalServerErrorException(
+        `Error in returning money : ${err.message}`,
+      );
+    }
   }
 }

@@ -1,8 +1,13 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
-import { User } from './user.schema';
+import { User, UserDocument } from './user.schema';
 import * as bcrypt from 'bcrypt';
 
 @Injectable()
@@ -13,7 +18,7 @@ export class UserService {
 
   async getUserByPhoneNumber(phoneNumber: string) {
     const user = await this.userModel.findOne({ phoneNumber });
-    if (!user) throw new UnauthorizedException('phone number not exists');
+    if (!user) throw new NotFoundException('phone number not exists');
     return user;
   }
   async create(dto: CreateUserDto) {
@@ -28,5 +33,76 @@ export class UserService {
       accessTokenWillExpireAt: Date.now() + 20 * 60 * 1000,
     });
     if (!res) throw new UnauthorizedException('user not exists');
+  }
+
+  async getUserBalance(phoneNumber: string) {
+    const user = await this.userModel.findOne({ phoneNumber }).select({
+      balance: 1,
+    });
+    return user.balance;
+  }
+
+  async reduceBalance(phoneNumber: string, ammount: number) {
+    const user = await this.getUserByPhoneNumber(phoneNumber);
+    if (user.balance < ammount)
+      throw new BadRequestException('not enugh balance to do the operation');
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      user._id,
+      {
+        $inc: { balance: -ammount },
+      },
+      { new: true },
+    );
+    if (updatedUser.balance < 0) {
+      await this.userModel.findByIdAndUpdate(
+        user._id,
+        {
+          $inc: { balance: ammount },
+        },
+        { new: true },
+      );
+      throw new BadRequestException('not enugh balance to do the operation');
+    }
+  }
+  async moveBalance(
+    senderPhone: string,
+    receiverPhone: string,
+    ammount: number,
+  ) {
+    // find user with senderPhoneNumber or reciever phoneNumber
+    try {
+      const [sender, reciever] = await Promise.all([
+        this.getUserByPhoneNumber(senderPhone),
+        this.getUserByPhoneNumber(receiverPhone),
+      ]);
+      if (sender.balance < ammount) {
+        throw new BadRequestException('not enugh balance to do the operation');
+      }
+      const res = await Promise.all([
+        this.userModel.findByIdAndUpdate(sender._id, {
+          $inc: { balance: -ammount },
+        }),
+        this.userModel.findByIdAndUpdate(reciever._id, {
+          $inc: { balance: ammount },
+        }),
+      ]);
+      if (res[0] === null && res[1] === null) {
+        throw new BadRequestException('transaciton failed!');
+      }
+      if (res[0] === null) {
+        await this.userModel.findByIdAndUpdate(reciever._id, {
+          $inc: { balance: -ammount },
+        });
+        throw new BadRequestException('transaciton failed!');
+      }
+      if (res[1] === null) {
+        await this.userModel.findByIdAndUpdate(sender._id, {
+          $inc: { balance: ammount },
+        });
+        throw new BadRequestException('transaciton failed!');
+      }
+    } catch (err) {
+      console.log(err);
+    }
   }
 }

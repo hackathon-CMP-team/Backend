@@ -51,7 +51,7 @@ export class AuthService {
   async login(dto: LoginDto) {
     const user = await this.userService.getUserByPhoneNumber(dto.phoneNumber);
     if (user.accessToken != null && user.accessTokenWillExpireAt > Date.now())
-      throw new UnauthorizedException('user already logged in');
+      throw new BadRequestException('user already logged in');
     const validPassword = await this.comparePassword(
       dto.password,
       user.password,
@@ -61,6 +61,7 @@ export class AuthService {
     await this.userService.saveAcessToken(accessToken, user._id);
     return { accessToken };
   }
+
 
   async logout(userId: Types.ObjectId) {
     await this.userService.saveAcessToken(null, userId);

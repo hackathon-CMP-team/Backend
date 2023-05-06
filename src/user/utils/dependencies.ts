@@ -12,4 +12,4 @@ export const UserDependingModules = [
 ];
 
 export const UserDependingControllers = [UserController];
-export const UserDependingServices = [UserService];
+export const UserDependingServices = [UserService, JwtService];

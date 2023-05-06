@@ -81,9 +81,53 @@ export class TransactionService {
       amount: dto.amount,
       date: Date.now(),
     });
+
     return { status: 'success' };
   }
+  async getIncome(phoneNumber: string): Promise<number> {
+    const res = await this.transactionTransferModel.aggregate([
+      {
+        $match: {
+          receiverPhone: phoneNumber,
+        },
+      },
+      {
+        $group: {
+          _id: 0,
+          total: { $sum: '$amount' },
+        },
+      },
+    ]);
+    return res.length ? res[0].total : 0;
+  }
 
+  async getOutcome(phoneNumber: string) {
+    const res = await this.transactionModel.aggregate([
+      {
+        $match: {
+          userPhone: phoneNumber,
+        },
+      },
+      {
+        $project: {
+          amount: {
+            $cond: {
+              if: { $eq: ['$type', TransactionVirtualVisa.name] },
+              then: '$usedAmount',
+              else: '$amount',
+            },
+          },
+        },
+      },
+      {
+        $group: {
+          _id: 1,
+          totalOutcome: { $sum: '$amount' },
+        },
+      },
+    ]);
+    return res.length ? res[0].totalOutcome : 0;
+  }
   getUserTransactions(phoneNumber: string) {
     return this.transactionModel
       .find({

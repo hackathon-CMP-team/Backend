@@ -23,11 +23,14 @@ export class TransactionTransfer extends Transaction {
 
 @Schema()
 export class TransactionVirtualVisa extends Transaction {
-  @Prop({ required: true })
+  @Prop({ required: true, unique: true })
   cardNumber: string;
 
   @Prop({ required: true })
   cvv: number;
+
+  @Prop({ default: false })
+  cardUsed: boolean;
 }
 
 @Schema()

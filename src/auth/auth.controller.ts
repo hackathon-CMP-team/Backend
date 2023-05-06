@@ -3,6 +3,7 @@ import {
   ApiBadRequestResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { Types } from 'mongoose';
@@ -12,15 +13,13 @@ import { LoginDto } from './dto/login.dto';
 import { JWTUserGuard } from './guards/user.guard';
 
 @Controller('auth')
+@ApiTags('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
   // create swagger api documentation
   @ApiOperation({ summary: 'Sign up new user' })
-  @ApiOkResponse({
-    description: 'User successfully signed up',
-    type: CreateUserDto,
-  })
+  @ApiOkResponse({ description: 'User successfully signed up' })
   @ApiBadRequestResponse({ description: "Can't create user" })
   @Post('signup')
   signup(@Body() dto: CreateUserDto) {

@@ -18,7 +18,7 @@ export class UserService {
 
   async getUserByPhoneNumber(phoneNumber: string) {
     const user = await this.userModel.findOne({ phoneNumber });
-    if (!user) throw new UnauthorizedException('phone number not exists');
+    if (!user) throw new NotFoundException('phone number not exists');
     return user;
   }
   async create(dto: CreateUserDto) {
@@ -39,6 +39,28 @@ export class UserService {
     return { balance: user.balance };
   }
 
+  async reduceBalance(phoneNumber: string, ammount: number) {
+    const user = await this.getUserByPhoneNumber(phoneNumber);
+    if (user.balance < ammount)
+      throw new BadRequestException('not enugh balance to do the operation');
+    const updatedUser = await this.userModel.findByIdAndUpdate(
+      user._id,
+      {
+        $inc: { balance: -ammount },
+      },
+      { new: true },
+    );
+    if (updatedUser.balance < 0) {
+      await this.userModel.findByIdAndUpdate(
+        user._id,
+        {
+          $inc: { balance: ammount },
+        },
+        { new: true },
+      );
+      throw new BadRequestException('not enugh balance to do the operation');
+    }
+  }
   async moveBalance(
     senderPhone: string,
     receiverPhone: string,
@@ -47,16 +69,11 @@ export class UserService {
     // find user with senderPhoneNumber or reciever phoneNumber
     try {
       const [sender, reciever] = await Promise.all([
-        this.userModel.findOne({ phoneNumber: senderPhone }),
-        this.userModel.findOne({ phoneNumber: receiverPhone }),
+        this.getUserByPhoneNumber(senderPhone),
+        this.getUserByPhoneNumber(receiverPhone),
       ]);
-      if (!reciever) {
-        throw new NotFoundException(
-          "wrong phone number, reciever doesn't exist",
-        );
-      }
       if (sender.balance < ammount) {
-        throw new NotFoundException('not enugh balance to do the operation');
+        throw new BadRequestException('not enugh balance to do the operation');
       }
       const res = await Promise.all([
         this.userModel.findByIdAndUpdate(sender._id, {

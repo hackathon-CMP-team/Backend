@@ -1,7 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 import { UserService } from 'src/user/user.service';
+import { VirtualCardDto } from './dto/virtual-card.dto';
+import { WithdrawDto } from './dto/withdraw.dto';
 import {
   TransactionTransfer,
   Transaction,
@@ -33,6 +35,46 @@ export class TransactionService {
       userPhone: senderPhone,
       receiverPhone,
       amount,
+      date: Date.now(),
+    });
+    return { status: 'success' };
+  }
+
+  // card is a 16 digit number
+  // it must be unique and random
+  private generateCardNumber() {
+    let cardNumber = '';
+    for (let i = 0; i < 4; i++) {
+      cardNumber += Math.floor(Math.random() * 10000)
+        .toString()
+        .padStart(4, '0');
+    }
+    return cardNumber;
+  }
+  private generateCVV() {
+    return Math.floor(Math.random() * 1000)
+      .toString()
+      .padStart(3, '0');
+  }
+  async createVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
+    await this.userService.reduceBalance(phoneNumber, dto.amount);
+    const cardNumber = this.generateCardNumber();
+    const cvv = this.generateCVV();
+    this.transactionVirtualVisaModel.create({
+      userPhone: phoneNumber,
+      cardNumber,
+      cvv,
+      amount: dto.amount,
+      date: Date.now(),
+    });
+    return { cardNumber, cvv };
+  }
+
+  async withdraw(phoneNumber: string, dto: WithdrawDto) {
+    await this.userService.reduceBalance(phoneNumber, dto.amount);
+    await this.transactionWithdrawModel.create({
+      userPhone: phoneNumber,
+      amount: dto.amount,
       date: Date.now(),
     });
     return { status: 'success' };

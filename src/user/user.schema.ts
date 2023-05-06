@@ -25,6 +25,9 @@ export class User {
 
   @Prop({ default: 0 })
   balance: number;
+
+  @Prop({ default: Date.now })
+  dateOfBirh: Date;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.comparePassword = async function (hashPassword: string) {

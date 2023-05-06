@@ -14,6 +14,13 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
   app.setGlobalPrefix('api');
+  app.enableCors({
+    origin: '*',
+    credentials: true,
+    methods: 'GET, POST, PATCH, DELETE, PUT, OPTIONS',
+    allowedHeaders:
+      'Origin, X-Requested-With, Content-Type, Accept, Authorization',
+  });
   await app.listen(3000);
 }
 bootstrap();

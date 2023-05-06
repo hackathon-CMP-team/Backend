@@ -22,7 +22,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'transfer money to another user' })
   @ApiOkResponse({ description: 'transfer successfully' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
-  @ApiBadRequestResponse({ description: 'not enugh balance' })
+  @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
   @UseGuards(JWTUserGuard)
   @Post('transfer')
@@ -40,7 +40,7 @@ export class TransactionController {
     type: ReturnedVirtualCardInfoDto,
   })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
-  @ApiBadRequestResponse({ description: 'not enugh balance' })
+  @ApiBadRequestResponse({ description: 'not enough balance' })
   @UseGuards(JWTUserGuard)
   @Post('virtual-card')
   createVirtualCard(@Req() req: any, @Body() dto: VirtualCardDto) {
@@ -50,7 +50,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'withdraw money from the wallet' })
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
-  @ApiBadRequestResponse({ description: 'not enugh balance' })
+  @ApiBadRequestResponse({ description: 'not enough balance' })
   @UseGuards(JWTUserGuard)
   @Post('withdraw')
   withdraw(@Req() req: any, @Body() dto: WithdrawDto) {

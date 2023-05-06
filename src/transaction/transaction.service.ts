@@ -44,8 +44,6 @@ export class TransactionService {
     return { status: 'success' };
   }
 
-  // card is a 16 digit number
-  // it must be unique and random
   private generateCardNumber() {
     let cardNumber = '';
     for (let i = 0; i < 4; i++) {

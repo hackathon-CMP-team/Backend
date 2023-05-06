@@ -1,4 +1,4 @@
-import { Body, Controller, Post, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiNotFoundResponse,
@@ -24,8 +24,8 @@ export class TransactionController {
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enugh balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
-  @Post('transfer')
   @UseGuards(JWTUserGuard)
+  @Post('transfer')
   transfer(@Req() req: any, @Body() dto: TransferDto) {
     return this.transactionService.transfer(
       req.user.phoneNumber,
@@ -41,17 +41,28 @@ export class TransactionController {
   })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enugh balance' })
-  @Post('virtual-card')
   @UseGuards(JWTUserGuard)
+  @Post('virtual-card')
   createVirtualCard(@Req() req: any, @Body() dto: VirtualCardDto) {
     return this.transactionService.createVirtualCard(req.user.phoneNumber, dto);
   }
 
-  @Post('withdraw')
+  @ApiOperation({ summary: 'withdraw money from the wallet' })
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enugh balance' })
+  @UseGuards(JWTUserGuard)
+  @Post('withdraw')
   withdraw(@Req() req: any, @Body() dto: WithdrawDto) {
     return this.transactionService.withdraw(req.user.phoneNumber, dto);
+  }
+
+  @ApiOperation({ summary: 'get all transactions of the user' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @UseGuards(JWTUserGuard)
+  @Get('')
+  getMyTransactions(@Req() req: any) {
+    return this.transactionService.getUserTransactions(req.user.phoneNumber);
   }
 }

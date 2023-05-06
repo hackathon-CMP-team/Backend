@@ -79,4 +79,18 @@ export class TransactionService {
     });
     return { status: 'success' };
   }
+
+  getUserTransactions(phoneNumber: string) {
+    return this.transactionModel
+      .find({
+        $or: [{ userPhone: phoneNumber }, { receiverPhone: phoneNumber }],
+      })
+      .select({
+        type: 1,
+        amount: 1,
+        date: 1,
+        userPhone: 1,
+        receiverPhone: 1,
+      });
+  }
 }

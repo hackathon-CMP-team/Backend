@@ -2,7 +2,7 @@
 
 ### first build the docker file
 
-```bach
+```bash
 docker build -t cash-tab .
 ```
 

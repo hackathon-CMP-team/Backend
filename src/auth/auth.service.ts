@@ -62,7 +62,6 @@ export class AuthService {
     return { accessToken };
   }
 
-
   async logout(userId: Types.ObjectId) {
     await this.userService.saveAcessToken(null, userId);
     return { status: 'success' };

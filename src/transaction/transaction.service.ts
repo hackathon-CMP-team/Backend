@@ -147,7 +147,7 @@ export class TransactionService {
         .find({
           userPhone: phoneNumber,
           unusedMoneyReturned: false,
-          // visaWillExpireAt: { $lte: Date.now() },
+          visaWillExpireAt: { $lte: Date.now() },
         })
         .select({
           amount: 1,

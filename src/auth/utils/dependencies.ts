@@ -5,7 +5,6 @@ import { User, UserSchema } from '../../user/user.schema';
 import { UserService } from '../../user/user.service';
 import { AuthController } from '../auth.controller';
 import { AuthService } from '../auth.service';
-import { UserStrategy } from '../stratigies/user.strategy';
 
 export const AuthDependingModules = [
   MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
@@ -21,5 +20,4 @@ export const AuthDependingServices = [
   AuthService,
   UserService,
   JwtService,
-  UserStrategy,
 ];

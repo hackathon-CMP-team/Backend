@@ -5,6 +5,7 @@ import { UserModule } from './user/user.module';
 import { AuthModule } from './auth/auth.module';
 import { TransactionModule } from './transaction/transaction.module';
 import { WalletModule } from './wallet/wallet.module';
+import { ChildrenModule } from './children/children.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -13,6 +14,7 @@ import { WalletModule } from './wallet/wallet.module';
     AuthModule,
     TransactionModule,
     WalletModule,
+    ChildrenModule,
   ],
   controllers: [],
   providers: [],

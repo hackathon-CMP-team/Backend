@@ -11,6 +11,7 @@ import {
 import { JWTParentGuard } from 'src/auth/guards/parent.guard';
 import { JWTUserGuard } from '../auth/guards/user.guard';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
+import { ReturnedTransactionDto } from './dto/returned-transaction.dto';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
@@ -24,7 +25,9 @@ export class TransactionController {
 
   @ApiOperation({ summary: 'transfer money to another user' })
   @ApiOkResponse({ description: 'transfer successfully' })
-  @ApiUnauthorizedResponse({ description: 'user not logged in, or user is a child' })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is a child',
+  })
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
   @ApiBearerAuth()
@@ -64,7 +67,9 @@ export class TransactionController {
 
   @ApiOperation({ summary: 'withdraw money from the wallet' })
   @ApiOkResponse({ description: 'operation successfully done' })
-  @ApiUnauthorizedResponse({ description: 'user not logged in, or user is a child' })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is a child',
+  })
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiBearerAuth()
   @UseGuards(JWTParentGuard)
@@ -74,7 +79,10 @@ export class TransactionController {
   }
 
   @ApiOperation({ summary: 'get all transactions of the user' })
-  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiOkResponse({
+    description: 'operation successfully done',
+    type: [ReturnedTransactionDto],
+  })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBearerAuth()
   @UseGuards(JWTUserGuard)

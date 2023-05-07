@@ -32,6 +32,9 @@ export class User {
 
   @Prop({ default: Date.now })
   dateOfBirh: Date;
+
+  @Prop({ default: null })
+  parentPhoneNumber: string;
 }
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.comparePassword = async function (hashPassword: string) {

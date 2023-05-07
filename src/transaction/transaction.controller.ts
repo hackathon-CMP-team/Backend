@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -8,6 +9,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JWTUserGuard } from '../auth/guards/user.guard';
+import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
@@ -25,6 +27,7 @@ export class TransactionController {
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
   @UseGuards(JWTUserGuard)
+  @ApiBearerAuth()
   @Post('transfer')
   transfer(@Req() req: any, @Body() dto: TransferDto) {
     return this.transactionService.transfer(
@@ -41,16 +44,28 @@ export class TransactionController {
   })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Post('virtual-card')
   createVirtualCard(@Req() req: any, @Body() dto: VirtualCardDto) {
     return this.transactionService.createVirtualCard(req.user.phoneNumber, dto);
   }
 
+  @ApiOperation({ summary: 'buy using virtual visa card' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiBadRequestResponse({
+    description: 'not enough balance or wrong card number',
+  })
+  @Post('payment')
+  buyUsingVirtualCard(@Body() dto: BuyUsingVirtualCardDto) {
+    return this.transactionService.buyUsingVirtualCard(dto);
+  }
+
   @ApiOperation({ summary: 'withdraw money from the wallet' })
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Post('withdraw')
   withdraw(@Req() req: any, @Body() dto: WithdrawDto) {
@@ -60,6 +75,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'get all transactions of the user' })
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Get('')
   getMyTransactions(@Req() req: any) {

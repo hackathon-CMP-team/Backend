@@ -16,6 +16,18 @@ export class Transaction {
 }
 
 @Schema()
+export class TransactionBuyUsingVirtualVisa extends Transaction {
+  @Prop({ required: true })
+  visaId: Types.ObjectId;
+
+  @Prop({ required: true })
+  category: string;
+
+  @Prop({ required: true })
+  product: string;
+}
+
+@Schema()
 export class TransactionTransfer extends Transaction {
   @Prop({ required: true })
   receiverPhone: string;
@@ -27,7 +39,7 @@ export class TransactionVirtualVisa extends Transaction {
   cardNumber: string;
 
   @Prop({ required: true })
-  cvv: number;
+  cvv: string;
 
   @Prop({ default: 0 })
   usedAmount: number;
@@ -53,3 +65,5 @@ export const TransactionVirtualVisaSchema = SchemaFactory.createForClass(
 );
 export const TransactionWithdrawSchema =
   SchemaFactory.createForClass(TransactionWithdraw);
+export const TransactionBuyUsingVirtualVisaSchema =
+   SchemaFactory.createForClass(TransactionBuyUsingVirtualVisa);

@@ -6,6 +6,7 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   const config = new DocumentBuilder()
+    .addBearerAuth()
     .setTitle('Cash Tab')
     .setDescription('This is an e-wallet application')
     .setVersion('1.0')

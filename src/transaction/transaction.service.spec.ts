@@ -12,6 +12,7 @@ import {
   TransactionDependingServices,
 } from './utils/dependencies';
 import {
+  TransactionBuyUsingVirtualVisa,
   TransactionTransfer,
   TransactionVirtualVisa,
   TransactionWithdraw,
@@ -131,13 +132,55 @@ describe('TransactionService', () => {
     });
   });
 
+  describe('buy using virtual card', () => {
+    let virtualCard: { cvv: string; cardNumber: string };
+    it('should buy using virtual card', async () => {
+      const amount = 1000;
+      virtualCard = await service.createVirtualCard(userInfo.phoneNumber, {
+        amount,
+      });
+      const buyResult = await service.buyUsingVirtualCard({
+        amount: 500,
+        cardNumber: virtualCard.cardNumber,
+        cvv: virtualCard.cvv,
+        category: 'food',
+        product: 'pizza',
+      });
+      expect(buyResult).toBeDefined();
+      expect(buyResult).toEqual({ status: 'success' });
+    });
+    it('should throw error if virtual card does not exist', async () => {
+      await expect(
+        service.buyUsingVirtualCard({
+          amount: 500,
+          cardNumber: '1234567890123456',
+          cvv: '123',
+          category: 'food',
+          product: 'pizza',
+        }),
+      ).rejects.toThrow('Invalid card');
+    });
+    it('should throw error if not enugh balance', async () => {
+      await expect(
+        service.buyUsingVirtualCard({
+          amount: 1000,
+          cardNumber: virtualCard.cardNumber,
+          cvv: virtualCard.cvv,
+          category: 'food',
+          product: 'pizza',
+        }),
+      ).rejects.toThrow('balance');
+    });
+  });
+
   describe('get transactions', () => {
     it('should get transactions', async () => {
       const transactions = await service.getUserTransactions(
         userInfo.phoneNumber,
       );
       expect(transactions).toBeDefined();
-      expect(transactions.length).toEqual(3);
+      // 2 virtual card, 1 withdraw, 1 transfer, 1 buy
+      expect(transactions.length).toEqual(5);
       expect(
         transactions.find((t) => t.type === TransactionVirtualVisa.name),
       ).toBeDefined();
@@ -147,7 +190,11 @@ describe('TransactionService', () => {
       expect(
         transactions.find((t) => t.type === TransactionTransfer.name),
       ).toBeDefined();
-
+      expect(
+        transactions.find(
+          (t) => t.type === TransactionBuyUsingVirtualVisa.name,
+        ),
+      ).toBeDefined();
     });
     it('should return empty array if the user does not exist', async () => {
       expect(await service.getUserTransactions('01032332845')).toEqual([]);
@@ -176,10 +223,11 @@ describe('TransactionService', () => {
       expect(outcome).toBeDefined();
       // 1000 is withdraw ammount, and 100 is transfer amount
       // 1000 of the virtual card is not counted as outcome because it is not used yet
-      expect(outcome).toEqual(1100);
+      expect(outcome).toEqual(1000 + 100 + 500);
       const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
       // note that the 1000 of the virtual card is counted here
-      expect(user.balance).toBe(7900);
+      // 2 * 1000 (virtual card) + 1 * 1000 (withdraw) + 1 * 100 (transfer)
+      expect(user.balance).toBe(10000 - 1000 - 1000 - 100 - 1000);
     });
     it('should get outcome', async () => {
       const outcome = await service.getOutcome(userInfo2.phoneNumber);

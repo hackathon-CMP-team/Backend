@@ -6,6 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
+import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import {
@@ -13,6 +14,7 @@ import {
   Transaction,
   TransactionWithdraw,
   TransactionVirtualVisa,
+  TransactionBuyUsingVirtualVisa,
 } from './transaction.schema';
 
 @Injectable()
@@ -26,6 +28,8 @@ export class TransactionService {
     private readonly transactionWithdrawModel: Model<TransactionWithdraw>,
     @InjectModel(TransactionVirtualVisa.name)
     private readonly transactionVirtualVisaModel: Model<TransactionVirtualVisa>,
+    @InjectModel(TransactionBuyUsingVirtualVisa.name)
+    private readonly transactionBuyUsingVirtualVisaModel: Model<TransactionBuyUsingVirtualVisa>,
     private readonly userService: UserService,
   ) {}
 
@@ -58,6 +62,43 @@ export class TransactionService {
       .toString()
       .padStart(3, '0');
   }
+
+  async buyUsingVirtualCard(dto: BuyUsingVirtualCardDto) {
+    const { cardNumber, cvv, amount, category, product } = dto;
+    const card = await this.transactionVirtualVisaModel.findOne({
+      cardNumber,
+      cvv,
+    });
+    if (!card) {
+      throw new BadRequestException('Invalid card number or CVV');
+    }
+    if (card.visaWillExpireAt < Date.now()) {
+      throw new BadRequestException('Card expired');
+    }
+    if (card.usedAmount + amount > card.amount) {
+      throw new BadRequestException('Insufficient balance');
+    }
+    const updatedOne = await this.transactionVirtualVisaModel.findOneAndUpdate(
+      { cardNumber, cvv },
+      { $inc: { usedAmount: amount } },
+    );
+    if (updatedOne.usedAmount > updatedOne.amount) {
+      await this.transactionVirtualVisaModel.findOneAndUpdate(
+        { cardNumber, cvv },
+        { $inc: { usedAmount: -amount } },
+      );
+      throw new BadRequestException('Insufficient balance');
+    }
+    await this.transactionBuyUsingVirtualVisaModel.create({
+      userPhone: card.userPhone,
+      visaId: card._id,
+      amount,
+      category,
+      product,
+      date: Date.now(),
+    });
+    return { status: 'success' };
+  }
   async createVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     const cardNumber = this.generateCardNumber();
@@ -70,6 +111,11 @@ export class TransactionService {
       date: Date.now(),
     });
     return { cardNumber, cvv };
+  }
+
+  async sendVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
+    const { cardNumber, cvv } = await this.createVirtualCard(phoneNumber, dto);
+    return { status: 'success' };
   }
 
   async withdraw(phoneNumber: string, dto: WithdrawDto) {
@@ -111,7 +157,7 @@ export class TransactionService {
           amount: {
             $cond: {
               if: { $eq: ['$type', TransactionVirtualVisa.name] },
-              then: '$usedAmount',
+              then: 0,
               else: '$amount',
             },
           },
@@ -139,6 +185,8 @@ export class TransactionService {
         receiverPhone: 1,
         usedAmount: 1,
         usedAt: 1,
+        product: 1,
+        categoty: 1,
       });
   }
   async getReturnedBalance(phoneNumber: string): Promise<number> {

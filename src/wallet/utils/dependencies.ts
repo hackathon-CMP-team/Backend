@@ -5,6 +5,8 @@ import { TransactionController } from '../../transaction/transaction.controller'
 import { TransactionService } from '../../transaction/transaction.service';
 import {
   Transaction,
+  TransactionBuyUsingVirtualVisa,
+  TransactionBuyUsingVirtualVisaSchema,
   TransactionSchema,
   TransactionTransfer,
   TransactionTransferSchema,
@@ -38,6 +40,10 @@ export const WalletDependingModules = [
         {
           name: TransactionVirtualVisa.name,
           schema: TransactionVirtualVisaSchema,
+        },
+        {
+          name: TransactionBuyUsingVirtualVisa.name,
+          schema: TransactionBuyUsingVirtualVisaSchema,
         },
       ],
     },

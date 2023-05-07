@@ -87,7 +87,7 @@ export class TransactionService {
         { cardNumber, cvv },
         { $inc: { usedAmount: -amount } },
       );
-      throw new InternalServerErrorException('Something went wrong');
+      throw new BadRequestException('Insufficient balance');
     }
     await this.transactionBuyUsingVirtualVisaModel.create({
       userPhone: card.userPhone,
@@ -111,6 +111,11 @@ export class TransactionService {
       date: Date.now(),
     });
     return { cardNumber, cvv };
+  }
+
+  async sendVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
+    const { cardNumber, cvv } = await this.createVirtualCard(phoneNumber, dto);
+    return { status: 'success' };
   }
 
   async withdraw(phoneNumber: string, dto: WithdrawDto) {
@@ -152,7 +157,7 @@ export class TransactionService {
           amount: {
             $cond: {
               if: { $eq: ['$type', TransactionVirtualVisa.name] },
-              then: '$usedAmount',
+              then: 0,
               else: '$amount',
             },
           },
@@ -180,6 +185,8 @@ export class TransactionService {
         receiverPhone: 1,
         usedAmount: 1,
         usedAt: 1,
+        product: 1,
+        categoty: 1,
       });
   }
   async getReturnedBalance(phoneNumber: string): Promise<number> {

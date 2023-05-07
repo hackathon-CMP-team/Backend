@@ -16,5 +16,7 @@ COPY . .
 # Expose the port on which the application listens
 EXPOSE 3000
 
+# Just for test jenkins pipelin. I will remove it again.
+
 # Start the application
 CMD ["npm", "run", "start:dev"]

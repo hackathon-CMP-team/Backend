@@ -8,6 +8,7 @@ import {
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JWTUserGuard } from '../auth/guards/user.guard';
+import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
 import { TransferDto } from './dto/transfer.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
@@ -45,6 +46,16 @@ export class TransactionController {
   @Post('virtual-card')
   createVirtualCard(@Req() req: any, @Body() dto: VirtualCardDto) {
     return this.transactionService.createVirtualCard(req.user.phoneNumber, dto);
+  }
+
+  @ApiOperation({ summary: 'buy using virtual visa card' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiBadRequestResponse({
+    description: 'not enough balance or wrong card number',
+  })
+  @Post('payment')
+  buyUsingVirtualCard(@Body() dto: BuyUsingVirtualCardDto) {
+    return this.transactionService.buyUsingVirtualCard(dto);
   }
 
   @ApiOperation({ summary: 'withdraw money from the wallet' })

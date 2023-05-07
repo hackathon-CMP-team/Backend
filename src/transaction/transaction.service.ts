@@ -6,6 +6,7 @@ import {
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
+import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import {
@@ -13,6 +14,7 @@ import {
   Transaction,
   TransactionWithdraw,
   TransactionVirtualVisa,
+  TransactionBuyUsingVirtualVisa,
 } from './transaction.schema';
 
 @Injectable()
@@ -26,6 +28,8 @@ export class TransactionService {
     private readonly transactionWithdrawModel: Model<TransactionWithdraw>,
     @InjectModel(TransactionVirtualVisa.name)
     private readonly transactionVirtualVisaModel: Model<TransactionVirtualVisa>,
+    @InjectModel(TransactionBuyUsingVirtualVisa.name)
+    private readonly transactionBuyUsingVirtualVisaModel: Model<TransactionBuyUsingVirtualVisa>,
     private readonly userService: UserService,
   ) {}
 
@@ -57,6 +61,43 @@ export class TransactionService {
     return Math.floor(Math.random() * 1000)
       .toString()
       .padStart(3, '0');
+  }
+
+  async buyUsingVirtualCard(dto: BuyUsingVirtualCardDto) {
+    const { cardNumber, cvv, amount, category, product } = dto;
+    const card = await this.transactionVirtualVisaModel.findOne({
+      cardNumber,
+      cvv,
+    });
+    if (!card) {
+      throw new BadRequestException('Invalid card number or CVV');
+    }
+    if (card.visaWillExpireAt < Date.now()) {
+      throw new BadRequestException('Card expired');
+    }
+    if (card.usedAmount + amount > card.amount) {
+      throw new BadRequestException('Insufficient balance');
+    }
+    const updatedOne = await this.transactionVirtualVisaModel.findOneAndUpdate(
+      { cardNumber, cvv },
+      { $inc: { usedAmount: amount } },
+    );
+    if (updatedOne.usedAmount > updatedOne.amount) {
+      await this.transactionVirtualVisaModel.findOneAndUpdate(
+        { cardNumber, cvv },
+        { $inc: { usedAmount: -amount } },
+      );
+      throw new InternalServerErrorException('Something went wrong');
+    }
+    await this.transactionBuyUsingVirtualVisaModel.create({
+      userPhone: card.userPhone,
+      visaId: card._id,
+      amount,
+      category,
+      product,
+      date: Date.now(),
+    });
+    return { status: 'success' };
   }
   async createVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     await this.userService.reduceBalance(phoneNumber, dto.amount);

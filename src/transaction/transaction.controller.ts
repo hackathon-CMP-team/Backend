@@ -8,6 +8,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { JWTParentGuard } from 'src/auth/guards/parent.guard';
 import { JWTUserGuard } from '../auth/guards/user.guard';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
@@ -23,11 +24,11 @@ export class TransactionController {
 
   @ApiOperation({ summary: 'transfer money to another user' })
   @ApiOkResponse({ description: 'transfer successfully' })
-  @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @ApiUnauthorizedResponse({ description: 'user not logged in, or user is a child' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
-  @UseGuards(JWTUserGuard)
   @ApiBearerAuth()
+  @UseGuards(JWTParentGuard)
   @Post('transfer')
   transfer(@Req() req: any, @Body() dto: TransferDto) {
     return this.transactionService.transfer(
@@ -63,10 +64,10 @@ export class TransactionController {
 
   @ApiOperation({ summary: 'withdraw money from the wallet' })
   @ApiOkResponse({ description: 'operation successfully done' })
-  @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @ApiUnauthorizedResponse({ description: 'user not logged in, or user is a child' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiBearerAuth()
-  @UseGuards(JWTUserGuard)
+  @UseGuards(JWTParentGuard)
   @Post('withdraw')
   withdraw(@Req() req: any, @Body() dto: WithdrawDto) {
     return this.transactionService.withdraw(req.user.phoneNumber, dto);

@@ -10,7 +10,7 @@ import { UserService } from '../../user/user.service';
  * logged in user guard class
  */
 @Injectable()
-export class JWTUserGuard implements CanActivate {
+export class JWTParentGuard implements CanActivate {
   constructor(
     private readonly jwtService: JwtService,
     private readonly userService: UserService,

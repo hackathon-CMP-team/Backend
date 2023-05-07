@@ -1,6 +1,7 @@
 import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiOkResponse,
   ApiOperation,
   ApiTags,
@@ -38,8 +39,9 @@ export class AuthController {
   @ApiOperation({ summary: 'logout from the website' })
   @ApiOkResponse({ description: 'User successfully logged out' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
-  @Post('logout')
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
+  @Post('logout')
   logout(@Req() req: any) {
     console.log(req.user);
     return this.authService.logout(req.user._id);

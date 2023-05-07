@@ -1,6 +1,7 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
+  ApiBearerAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -26,6 +27,7 @@ export class TransactionController {
   @ApiBadRequestResponse({ description: 'not enough balance' })
   @ApiNotFoundResponse({ description: 'receiver not found' })
   @UseGuards(JWTUserGuard)
+  @ApiBearerAuth()
   @Post('transfer')
   transfer(@Req() req: any, @Body() dto: TransferDto) {
     return this.transactionService.transfer(
@@ -42,6 +44,7 @@ export class TransactionController {
   })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Post('virtual-card')
   createVirtualCard(@Req() req: any, @Body() dto: VirtualCardDto) {
@@ -62,6 +65,7 @@ export class TransactionController {
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @ApiBadRequestResponse({ description: 'not enough balance' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Post('withdraw')
   withdraw(@Req() req: any, @Body() dto: WithdrawDto) {
@@ -71,6 +75,7 @@ export class TransactionController {
   @ApiOperation({ summary: 'get all transactions of the user' })
   @ApiOkResponse({ description: 'operation successfully done' })
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @ApiBearerAuth()
   @UseGuards(JWTUserGuard)
   @Get('')
   getMyTransactions(@Req() req: any) {

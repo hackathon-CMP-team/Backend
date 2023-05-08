@@ -19,6 +19,29 @@ import {
 } from '../transaction.schema';
 import { JwtService } from '@nestjs/jwt';
 
+export const TransactionDiscriminators = [
+  {
+    name: TransactionTransfer.name,
+    schema: TransactionTransferSchema,
+  },
+  {
+    name: TransactionWithdraw.name,
+    schema: TransactionWithdrawSchema,
+  },
+  {
+    name: TransactionVirtualVisa.name,
+    schema: TransactionVirtualVisaSchema,
+  },
+  {
+    name: TransactionBuyUsingVirtualVisa.name,
+    schema: TransactionBuyUsingVirtualVisaSchema,
+  },
+  {
+    name: transactionRequestMoney.name,
+    schema: transactionRequestMoneySchema,
+  },
+];
+
 export const TransactionDependingModules = [
   MongooseModule.forFeature([
     {
@@ -28,28 +51,7 @@ export const TransactionDependingModules = [
     {
       name: Transaction.name,
       schema: TransactionSchema,
-      discriminators: [
-        {
-          name: TransactionTransfer.name,
-          schema: TransactionTransferSchema,
-        },
-        {
-          name: TransactionWithdraw.name,
-          schema: TransactionWithdrawSchema,
-        },
-        {
-          name: TransactionVirtualVisa.name,
-          schema: TransactionVirtualVisaSchema,
-        },
-        {
-          name: TransactionBuyUsingVirtualVisa.name,
-          schema: TransactionBuyUsingVirtualVisaSchema,
-        },
-        {
-          name: transactionRequestMoney.name,
-          schema: transactionRequestMoneySchema,
-        },
-      ],
+      discriminators: TransactionDiscriminators,
     },
   ]),
 ];

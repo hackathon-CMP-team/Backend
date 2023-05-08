@@ -20,6 +20,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { WalletController } from '../wallet.controller';
 import { WalletService } from '../wallet.service';
+import { TransactionDiscriminators } from 'src/transaction/utils/dependencies';
 
 export const WalletDependingModules = [
   MongooseModule.forFeature([
@@ -30,28 +31,7 @@ export const WalletDependingModules = [
     {
       name: Transaction.name,
       schema: TransactionSchema,
-      discriminators: [
-        {
-          name: TransactionTransfer.name,
-          schema: TransactionTransferSchema,
-        },
-        {
-          name: TransactionWithdraw.name,
-          schema: TransactionWithdrawSchema,
-        },
-        {
-          name: TransactionVirtualVisa.name,
-          schema: TransactionVirtualVisaSchema,
-        },
-        {
-          name: TransactionBuyUsingVirtualVisa.name,
-          schema: TransactionBuyUsingVirtualVisaSchema,
-        },
-        {
-          name: transactionRequestMoney.name,
-          schema: transactionRequestMoneySchema,
-        },
-      ],
+      discriminators: TransactionDiscriminators,
     },
   ]),
 ];

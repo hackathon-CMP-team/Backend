@@ -194,6 +194,7 @@ export class TransactionService {
         usedAt: 1,
         product: 1,
         categoty: 1,
+        _id: 1,
       });
   }
   async getReturnedBalance(phoneNumber: string): Promise<number> {

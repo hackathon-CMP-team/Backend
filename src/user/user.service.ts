@@ -101,4 +101,11 @@ export class UserService {
       throw new BadRequestException('transaciton failed!');
     }
   }
+
+  getChildren(phoneNumber: string) {
+    return this.userModel.find({ parentPhoneNumber: phoneNumber }).select({
+      phoneNumber: 1,
+      name: 1,
+    });
+  }
 }

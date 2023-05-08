@@ -82,4 +82,14 @@ export class ChildrenController {
   getOutcome(@Req() req: any, @Body() dto: ChildInfoDto) {
     return this.childrenService.getOutcome(req.user.phoneNumber, dto);
   }
+
+  @ApiOperation({ summary: 'get all children of a spcific parent' })
+  @ApiOkResponse({
+    description: 'operation successfully done',
+    type: [ChildInfoDto],
+  })
+  @Get('me')
+  getChildren(@Req() req: any) {
+    return this.childrenService.getChildren(req.user.phoneNumber);
+  }
 }

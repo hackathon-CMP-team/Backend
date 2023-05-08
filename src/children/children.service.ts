@@ -36,4 +36,8 @@ export class ChildrenService {
     const child = await this.validateChild(phoneNumber, dto.childPhoneNumber);
     return this.walletService.getOutcome(child.phoneNumber);
   }
+
+  async getChildren(phoneNumber: string) {
+    return this.userService.getChildren(phoneNumber);
+  }
 }

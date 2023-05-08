@@ -9,7 +9,7 @@ import {
 } from './utils/dependencies';
 import { UserGender, UserRole } from '../user/user.schema';
 import { testDependingModules } from '../utils/test-dependencies';
-
+jest.mock('../utils/mail/mail.service');
 describe('AuthService', () => {
   let service: AuthService;
   let module: TestingModule;
@@ -37,6 +37,7 @@ describe('AuthService', () => {
   describe('signup', () => {
     it('should return a token', async () => {
       const { accessToken } = await service.signup(userInfo);
+      console.log(accessToken);
       expect(accessToken).toBeDefined();
     });
     it('should throw an error if user already exists', async () => {

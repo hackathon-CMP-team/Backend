@@ -27,9 +27,7 @@ export class UserService {
   }
   async create(dto: CreateUserDto) {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
-    console.log(dto);
     const user = await this.userModel.create({ ...dto, password });
-    console.log(user.dateOfBirth);
     return user;
   }
 

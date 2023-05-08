@@ -7,6 +7,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { UserService } from '../user/user.service';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
+import { RequestMoneyDto } from './dto/request.dto';
+import { ResponseToRequestDto } from './dto/resonse-to-request.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
 import { WithdrawDto } from './dto/withdraw.dto';
 import {
@@ -15,6 +17,8 @@ import {
   TransactionWithdraw,
   TransactionVirtualVisa,
   TransactionBuyUsingVirtualVisa,
+  transactionRequestMoney,
+  RequestMoneyStatus,
 } from './transaction.schema';
 
 @Injectable()
@@ -24,6 +28,8 @@ export class TransactionService {
     private readonly transactionModel: Model<Transaction>,
     @InjectModel(TransactionTransfer.name)
     private readonly transactionTransferModel: Model<TransactionTransfer>,
+    @InjectModel(transactionRequestMoney.name)
+    private readonly transactionRequestMoneyModel: Model<transactionRequestMoney>,
     @InjectModel(TransactionWithdraw.name)
     private readonly transactionWithdrawModel: Model<TransactionWithdraw>,
     @InjectModel(TransactionVirtualVisa.name)
@@ -218,5 +224,62 @@ export class TransactionService {
         `Error in returning money : ${err.message}`,
       );
     }
+  }
+
+  async requestMoney(phoneNumber: string, dto: RequestMoneyDto) {
+    const { amount, senderPhone } = dto;
+    await this.transactionRequestMoneyModel.create({
+      userPhone: phoneNumber,
+      senderPhone,
+      amount,
+      date: Date.now(),
+    });
+    return { status: 'success' };
+  }
+
+  async acceptRequest(phoneNumber: string, dto: ResponseToRequestDto) {
+    const transaction =
+      await this.transactionRequestMoneyModel.findOneAndUpdate(
+        {
+          _id: dto.requestId,
+          senderPhone: phoneNumber,
+          userPhone: dto.requesterPhone,
+          status: RequestMoneyStatus.PENDING,
+        },
+        { status: RequestMoneyStatus.ACCEPTED },
+      );
+    if (!transaction) {
+      throw new BadRequestException('Invalid request');
+    }
+    const { balance } = await this.userService.getUserByPhoneNumber(
+      phoneNumber,
+    );
+    if (balance < transaction.amount) {
+      await this.transactionRequestMoneyModel.findByIdAndUpdate(dto.requestId, {
+        status: RequestMoneyStatus.REJECTED,
+      });
+      throw new BadRequestException(
+        'Insufficient balance to accept the operation, request is rejected',
+      );
+    }
+    await this.transfer(phoneNumber, dto.requesterPhone, transaction.amount);
+    return { status: 'success' };
+  }
+
+  async rejectRequest(phoneNumber: string, dto: ResponseToRequestDto) {
+    const transaction =
+      await this.transactionRequestMoneyModel.findOneAndUpdate(
+        {
+          _id: dto.requestId,
+          senderPhone: phoneNumber,
+          userPhone: dto.requesterPhone,
+          status: RequestMoneyStatus.PENDING,
+        },
+        { status: RequestMoneyStatus.REJECTED },
+      );
+    if (!transaction) {
+      throw new BadRequestException('Invalid request');
+    }
+    return { status: 'success' };
   }
 }

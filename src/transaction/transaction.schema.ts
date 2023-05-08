@@ -33,6 +33,23 @@ export class TransactionTransfer extends Transaction {
   receiverPhone: string;
 }
 
+export enum RequestMoneyStatus {
+  PENDING = 'PENDING',
+  ACCEPTED = 'ACCEPTED',
+  REJECTED = 'REJECTED',
+}
+@Schema()
+export class transactionRequestMoney extends Transaction {
+  @Prop({ required: true })
+  senderPhone: string;
+
+  @Prop({ default: RequestMoneyStatus.PENDING, enum: RequestMoneyStatus })
+  status: RequestMoneyStatus;
+
+  @Prop({ default: null })
+  repliedAt: Date;
+}
+
 @Schema()
 export class TransactionVirtualVisa extends Transaction {
   @Prop({ required: true, unique: true })
@@ -66,4 +83,8 @@ export const TransactionVirtualVisaSchema = SchemaFactory.createForClass(
 export const TransactionWithdrawSchema =
   SchemaFactory.createForClass(TransactionWithdraw);
 export const TransactionBuyUsingVirtualVisaSchema =
-   SchemaFactory.createForClass(TransactionBuyUsingVirtualVisa);
+  SchemaFactory.createForClass(TransactionBuyUsingVirtualVisa);
+
+export const transactionRequestMoneySchema = SchemaFactory.createForClass(
+  transactionRequestMoney,
+);

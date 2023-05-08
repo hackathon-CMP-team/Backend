@@ -11,6 +11,8 @@ import {
 import { JWTParentGuard } from '../auth/guards/parent.guard';
 import { JWTUserGuard } from '../auth/guards/user.guard';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
+import { RequestMoneyDto } from './dto/request.dto';
+import { ResponseToRequestDto } from './dto/resonse-to-request.dto';
 import { ReturnedTransactionDto } from './dto/returned-transaction.dto';
 import { ReturnedVirtualCardInfoDto } from './dto/returned-virtual-card-info.dto';
 import { TransferDto } from './dto/transfer.dto';
@@ -89,5 +91,20 @@ export class TransactionController {
   @Get('')
   getMyTransactions(@Req() req: any) {
     return this.transactionService.getUserTransactions(req.user.phoneNumber);
+  }
+
+  @Post('request')
+  requestMoney(req: any, @Body() dto: RequestMoneyDto) {
+    return this.transactionService.requestMoney(req.user.phoneNumber, dto);
+  }
+
+  @Post('request/accept')
+  acceptRequest(req: any, @Body() dto: ResponseToRequestDto) {
+    return this.transactionService.acceptRequest(req.user.phoneNumber, dto);
+  }
+
+  @Post('request/reject')
+  rejectRequest(req: any, @Body() dto: ResponseToRequestDto) {
+    return this.transactionService.rejectRequest(req.user.phoneNumber, dto);
   }
 }

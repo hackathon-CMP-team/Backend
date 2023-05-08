@@ -6,6 +6,8 @@ import {
   Transaction,
   TransactionBuyUsingVirtualVisa,
   TransactionBuyUsingVirtualVisaSchema,
+  transactionRequestMoney,
+  transactionRequestMoneySchema,
   TransactionSchema,
   TransactionTransfer,
   TransactionTransferSchema,
@@ -43,6 +45,10 @@ export const ChildrernDependingModules = [
         {
           name: TransactionBuyUsingVirtualVisa.name,
           schema: TransactionBuyUsingVirtualVisaSchema,
+        },
+        {
+          name: transactionRequestMoney.name,
+          schema: transactionRequestMoneySchema,
         },
       ],
     },

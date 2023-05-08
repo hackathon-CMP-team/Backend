@@ -1,11 +1,16 @@
 import { ApiProperty, ApiTags } from '@nestjs/swagger';
 import {
+  IsDate,
+  isDate,
+  IsDateString,
   IsEmail,
+  IsEnum,
   IsNotEmpty,
   IsString,
   MinLength,
   ValidateBy,
 } from 'class-validator';
+import { UserRole } from './returned-user.dto';
 
 export class CreateUserDto {
   @IsEmail(undefined, { message: 'must be a valid email' })
@@ -24,4 +29,14 @@ export class CreateUserDto {
   @IsNotEmpty()
   @ApiProperty({ description: 'name of the user' })
   name: string;
+
+  @IsDateString()
+  @ApiProperty({ description: 'date of birth of the user' })
+  dateOfBirth: Date;
+
+  @IsEnum(UserRole)
+  @ApiProperty({ description: 'role of the user' })
+  role: string;
+
+  gender: string;
 }

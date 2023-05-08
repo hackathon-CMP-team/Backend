@@ -9,6 +9,10 @@ import { Model, Types } from 'mongoose';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User, UserDocument } from './user.schema';
 import * as bcrypt from 'bcrypt';
+import {
+  ResetPasswordDto,
+  VerifyOTPDto,
+} from 'src/auth/dto/forget-password.dto';
 
 @Injectable()
 export class UserService {
@@ -23,7 +27,9 @@ export class UserService {
   }
   async create(dto: CreateUserDto) {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
+    console.log(dto);
     const user = await this.userModel.create({ ...dto, password });
+    console.log(user.dateOfBirth);
     return user;
   }
 
@@ -107,5 +113,43 @@ export class UserService {
       phoneNumber: 1,
       name: 1,
     });
+  }
+
+  saveOTP(phoneNumber: string, otp: string) {
+    return this.userModel.findOneAndUpdate(
+      { phoneNumber },
+      { otp, otpWillExpireAt: Date.now() + 5 * 60 * 1000 },
+    );
+  }
+
+  async verifyOTP(dto: VerifyOTPDto) {
+    const user = await this.userModel.findOne({
+      phoneNumber: dto.phoneNumber,
+    });
+    if (!user) throw new NotFoundException('user not found');
+    if (user.otp !== dto.otp || user.otpWillExpireAt < Date.now())
+      throw new UnauthorizedException('invalid otp');
+    return { status: 'success' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    const user = await this.userModel.findOne({
+      phoneNumber: dto.phoneNumber,
+    });
+    if (!user) throw new NotFoundException('user not found');
+    if (user.otp !== dto.otp || user.otpWillExpireAt < Date.now())
+      throw new UnauthorizedException('invalid otp');
+    const password = await bcrypt.hash(
+      dto.newPassword,
+      await bcrypt.genSalt(10),
+    );
+    await this.userModel.findByIdAndUpdate(user._id, {
+      password,
+      otp: null,
+      otpWillExpireAt: null,
+      accessToken: null,
+      accessTokenWillExpireAt: null,
+    });
+    return { status: 'success' };
   }
 }

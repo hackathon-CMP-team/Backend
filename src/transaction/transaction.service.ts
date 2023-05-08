@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { UserRole } from 'src/user/user.schema';
+import { UserRole } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { RequestMoneyDto } from './dto/request.dto';
@@ -163,7 +163,12 @@ export class TransactionService {
         $project: {
           amount: {
             $cond: {
-              if: { $eq: ['$type', TransactionVirtualVisa.name] },
+              if: {
+                $or: [
+                  { $eq: ['$type', TransactionVirtualVisa.name] },
+                  { $eq: ['$type', transactionRequestMoney.name] },
+                ],
+              },
               then: 0,
               else: '$amount',
             },

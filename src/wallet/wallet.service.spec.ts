@@ -1,11 +1,8 @@
-import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
+import { testDependingModules } from '../utils/test-dependencies';
 import { TransactionService } from '../transaction/transaction.service';
 import { UserService } from '../user/user.service';
-import {
-  closeInMongodConnection,
-  rootMongooseTestModule,
-} from '../utils/mongoose-in-memory';
+import { closeInMongodConnection } from '../utils/mongoose-in-memory';
 import {
   WalletDependingControllers,
   WalletDependingModules,
@@ -20,11 +17,7 @@ describe('WalletService', () => {
   let module: TestingModule;
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        rootMongooseTestModule(),
-        ...WalletDependingModules,
-      ],
+      imports: [...testDependingModules, ...WalletDependingModules],
       controllers: WalletDependingControllers,
       providers: WalletDependingServices,
     }).compile();

@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 import {
   ResetPasswordDto,
   VerifyOTPDto,
-} from 'src/auth/dto/forget-password.dto';
+} from '../auth/dto/forget-password.dto';
 
 @Injectable()
 export class UserService {
@@ -27,9 +27,7 @@ export class UserService {
   }
   async create(dto: CreateUserDto) {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
-    console.log(dto);
     const user = await this.userModel.create({ ...dto, password });
-    console.log(user.dateOfBirth);
     return user;
   }
 

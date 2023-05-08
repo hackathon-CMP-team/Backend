@@ -3,10 +3,23 @@ import { Document, Types } from 'mongoose';
 export type UserDocument = User & Document;
 import * as bcrypt from 'bcrypt';
 
+export enum UserRole {
+  PARENT = 'parent',
+  CHILD = 'child',
+}
+
+export enum UserGender {
+  MALE = 'male',
+  FEMALE = 'female',
+}
+
 @Schema()
 export class User {
-  @Prop({ default: 'parent', enum: ['parent', 'child'] })
+  @Prop({ default: 'parent', enum: UserRole })
   role: string;
+
+  @Prop({ required: true, enum: UserGender })
+  gender: string;
 
   @Prop({ required: true, unique: true })
   email: string;

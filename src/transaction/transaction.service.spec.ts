@@ -17,6 +17,8 @@ import {
   TransactionVirtualVisa,
   TransactionWithdraw,
 } from './transaction.schema';
+import { testDependingModules } from '../utils/test-dependencies';
+import { UserGender, UserRole } from '../user/user.schema';
 
 describe('TransactionService', () => {
   let service: TransactionService;
@@ -27,20 +29,22 @@ describe('TransactionService', () => {
     password: 'password',
     name: 'omar',
     phoneNumber: '01032332843',
+    role: UserRole.PARENT,
+    gender: UserGender.MALE,
+    dateOfBirth: new Date(),
   };
   const userInfo2 = {
     email: 'user2@example.com',
     password: 'password',
     name: 'omar',
     phoneNumber: '01032332844',
+    role: UserRole.PARENT,
+    gender: UserGender.MALE,
+    dateOfBirth: new Date(),
   };
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        rootMongooseTestModule(),
-        ...TransactionDependingModules,
-      ],
+      imports: [...testDependingModules, ...TransactionDependingModules],
       controllers: TransactionDependingControllers,
       providers: TransactionDependingServices,
     }).compile();

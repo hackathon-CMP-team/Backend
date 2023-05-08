@@ -1,10 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { IsEnum, IsNumber, IsString } from 'class-validator';
-
-export enum UserRole {
-  PARENT = 'parent',
-  CHILD = 'child',
-}
+import { UserRole } from '../user.schema';
 
 export class ReturnedUserInfoDto {
   @ApiProperty({ example: 'parent' })

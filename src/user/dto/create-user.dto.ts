@@ -10,7 +10,7 @@ import {
   MinLength,
   ValidateBy,
 } from 'class-validator';
-import { UserRole } from './returned-user.dto';
+import { UserRole } from '../user.schema';
 
 export class CreateUserDto {
   @IsEmail(undefined, { message: 'must be a valid email' })

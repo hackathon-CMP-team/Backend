@@ -10,9 +10,8 @@ import { User, UserDocument } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
-import { promisify } from 'util';
 import { Types } from 'mongoose';
-import { EmailService } from 'src/utils/mail/mail.service';
+import { EmailService } from '../utils/mail/mail.service';
 import { ResetPasswordDto, VerifyOTPDto } from './dto/forget-password.dto';
 
 @Injectable()
@@ -50,24 +49,23 @@ export class AuthService {
     );
   }
 
+  private async getAuthInfo(user: UserDocument) {
+    const { accessToken } = await this.getAuthToken(user);
+    await this.userService.saveAcessToken(accessToken, user._id);
+    return {
+      accessToken,
+      user: {
+        name: user.name,
+        phoneNumber: user.phoneNumber,
+        role: user.role,
+        age: this.calculateAge(user.dateOfBirth),
+      },
+    };
+  }
   async signup(dto: CreateUserDto) {
-    try {
-      const user = await this.userService.create(dto);
-      const { accessToken } = await this.getAuthToken(user);
-      await this.userService.saveAcessToken(accessToken, user._id);
-      await this.sendHelloMail(user);
-      return {
-        accessToken,
-        user: {
-          name: user.name,
-          phoneNumber: user.phoneNumber,
-          role: user.role,
-          age: this.calculateAge(user.dateOfBirth),
-        },
-      };
-    } catch (err) {
-      throw new BadRequestException(err.message);
-    }
+    const user = await this.userService.create(dto);
+    await this.sendHelloMail(user);
+    return this.getAuthInfo(user);
   }
 
   async comparePassword(password: string, hashPassword: string) {
@@ -88,17 +86,7 @@ export class AuthService {
       user.password,
     );
     if (!validPassword) throw new UnauthorizedException('wrong password');
-    const { accessToken } = await this.getAuthToken(user);
-    // await this.userService.saveAcessToken(accessToken, user._id);
-    return {
-      accessToken,
-      user: {
-        name: user.name,
-        phoneNumber: user.phoneNumber,
-        role: user.role,
-        age: this.calculateAge(user.dateOfBirth),
-      },
-    };
+    return this.getAuthInfo(user);
   }
 
   async logout(userId: Types.ObjectId) {

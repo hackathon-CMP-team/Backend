@@ -1,9 +1,5 @@
-import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  closeInMongodConnection,
-  rootMongooseTestModule,
-} from '../utils/mongoose-in-memory';
+import { closeInMongodConnection } from '../utils/mongoose-in-memory';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import {
@@ -11,7 +7,10 @@ import {
   AuthDependingModules,
   AuthDependingServices,
 } from './utils/dependencies';
+import { UserGender, UserRole } from '../user/user.schema';
+import { testDependingModules } from '../utils/test-dependencies';
 
+jest.mock('../utils/mail/mail.service');
 describe('AuthService', () => {
   let service: AuthService;
   let module: TestingModule;
@@ -21,14 +20,13 @@ describe('AuthService', () => {
     phoneNumber: '01033304427',
     email: 'email@example.com',
     password: 'password',
+    gender: UserGender.MALE,
+    role: UserRole.PARENT,
+    dateOfBirth: new Date(),
   };
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        rootMongooseTestModule(),
-        ...AuthDependingModules,
-      ],
+      imports: [...testDependingModules, ...AuthDependingModules],
       controllers: AuthDependingControllers,
       providers: AuthDependingServices,
     }).compile();
@@ -40,6 +38,7 @@ describe('AuthService', () => {
   describe('signup', () => {
     it('should return a token', async () => {
       const { accessToken } = await service.signup(userInfo);
+      console.log(accessToken);
       expect(accessToken).toBeDefined();
     });
     it('should throw an error if user already exists', async () => {

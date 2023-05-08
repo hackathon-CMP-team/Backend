@@ -98,7 +98,7 @@ export class TransactionController {
   @ApiUnauthorizedResponse({ description: 'user not logged in' })
   @UseGuards(JWTUserGuard)
   @Post('request')
-  requestMoney(req: any, @Body() dto: RequestMoneyDto) {
+  requestMoney(@Req() req: any, @Body() dto: RequestMoneyDto) {
     return this.transactionService.requestMoney(req.user.phoneNumber, dto);
   }
 
@@ -110,7 +110,7 @@ export class TransactionController {
   })
   @Post('request/accept')
   @UseGuards(JWTParentGuard)
-  acceptRequest(req: any, @Body() dto: ResponseToRequestDto) {
+  acceptRequest(@Req() req: any, @Body() dto: ResponseToRequestDto) {
     return this.transactionService.acceptRequest(req.user.phoneNumber, dto);
   }
 
@@ -122,7 +122,7 @@ export class TransactionController {
   })
   @UseGuards(JWTParentGuard)
   @Post('request/reject')
-  rejectRequest(req: any, @Body() dto: ResponseToRequestDto) {
+  rejectRequest(@Req() req: any, @Body() dto: ResponseToRequestDto) {
     return this.transactionService.rejectRequest(req.user.phoneNumber, dto);
   }
 }

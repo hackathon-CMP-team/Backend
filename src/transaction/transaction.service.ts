@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
+import { UserRole } from 'src/user/user.schema';
 import { UserService } from '../user/user.service';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
 import { RequestMoneyDto } from './dto/request.dto';
@@ -228,6 +229,12 @@ export class TransactionService {
 
   async requestMoney(phoneNumber: string, dto: RequestMoneyDto) {
     const { amount, senderPhone } = dto;
+    const { role } = await this.userService.getUserByPhoneNumber(
+      dto.senderPhone,
+    );
+    if (role === UserRole.CHILD) {
+      throw new BadRequestException('you cannot request money from a child');
+    }
     await this.transactionRequestMoneyModel.create({
       userPhone: phoneNumber,
       senderPhone,

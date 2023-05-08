@@ -93,16 +93,34 @@ export class TransactionController {
     return this.transactionService.getUserTransactions(req.user.phoneNumber);
   }
 
+  @ApiOperation({ summary: 'request money from another user' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiUnauthorizedResponse({ description: 'user not logged in' })
+  @UseGuards(JWTUserGuard)
   @Post('request')
   requestMoney(req: any, @Body() dto: RequestMoneyDto) {
     return this.transactionService.requestMoney(req.user.phoneNumber, dto);
   }
 
+  @ApiOperation({ summary: 'accept request and transfer money to this user' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiBadRequestResponse({ description: 'invalid operation' })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in or user is a child',
+  })
   @Post('request/accept')
+  @UseGuards(JWTParentGuard)
   acceptRequest(req: any, @Body() dto: ResponseToRequestDto) {
     return this.transactionService.acceptRequest(req.user.phoneNumber, dto);
   }
 
+  @ApiOperation({ summary: 'reject request of transfering money to a user' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiBadRequestResponse({ description: 'invalid operation' })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in or user is a child',
+  })
+  @UseGuards(JWTParentGuard)
   @Post('request/reject')
   rejectRequest(req: any, @Body() dto: ResponseToRequestDto) {
     return this.transactionService.rejectRequest(req.user.phoneNumber, dto);

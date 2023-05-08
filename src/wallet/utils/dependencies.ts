@@ -1,21 +1,10 @@
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from '../../user/user.schema';
 import { UserService } from '../../user/user.service';
-import { TransactionController } from '../../transaction/transaction.controller';
 import { TransactionService } from '../../transaction/transaction.service';
 import {
   Transaction,
-  TransactionBuyUsingVirtualVisa,
-  TransactionBuyUsingVirtualVisaSchema,
-  transactionRequestMoney,
-  transactionRequestMoneySchema,
   TransactionSchema,
-  TransactionTransfer,
-  TransactionTransferSchema,
-  TransactionVirtualVisa,
-  TransactionVirtualVisaSchema,
-  TransactionWithdraw,
-  TransactionWithdrawSchema,
 } from '../../transaction/transaction.schema';
 import { JwtService } from '@nestjs/jwt';
 import { WalletController } from '../wallet.controller';

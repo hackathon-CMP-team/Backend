@@ -11,12 +11,14 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { promisify } from 'util';
 import { Types } from 'mongoose';
+import { EmailService } from 'src/utils/mail/mail.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   private async getAuthToken(user: UserDocument) {
@@ -50,6 +52,11 @@ export class AuthService {
 
   async login(dto: LoginDto) {
     const user = await this.userService.getUserByPhoneNumber(dto.phoneNumber);
+    await this.emailService.sendEmail(
+      'fareedomar159@gmail.com',
+      'test',
+      'test',
+    );
     if (user.accessToken != null && user.accessTokenWillExpireAt > Date.now())
       throw new BadRequestException('user already logged in');
     const validPassword = await this.comparePassword(

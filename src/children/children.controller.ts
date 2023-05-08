@@ -18,7 +18,7 @@ import { JWTParentGuard } from 'src/auth/guards/parent.guard';
 import { ReturnedTransactionDto } from 'src/transaction/dto/returned-transaction.dto';
 import { ReturnedBalanceDto } from 'src/wallet/dto/returned-balance.dto';
 import { ChildrenService } from './children.service';
-import { ChildInfoDto } from './dto/child-info.dto';
+import { ChildInfoDto, ReturnedChildInfoDto } from './dto/child-info.dto';
 
 @Controller('children')
 @ApiTags('children')
@@ -81,5 +81,18 @@ export class ChildrenController {
   @Get('outcome')
   getOutcome(@Req() req: any, @Body() dto: ChildInfoDto) {
     return this.childrenService.getOutcome(req.user.phoneNumber, dto);
+  }
+
+  @ApiOperation({ summary: 'get all children of a spcific parent' })
+  @ApiOkResponse({
+    description: 'operation successfully done',
+    type: [ReturnedChildInfoDto],
+  })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is not a parent',
+  })
+  @Get('me')
+  getChildren(@Req() req: any) {
+    return this.childrenService.getChildren(req.user.phoneNumber);
   }
 }

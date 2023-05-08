@@ -2,15 +2,24 @@ import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiProperty,
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { Types } from 'mongoose';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
+import {
+  ForgetPasswordDto,
+  ResetPasswordDto,
+  VerifyOTPDto,
+} from './dto/forget-password.dto';
 import { LoginDto } from './dto/login.dto';
+import { ReturnedAuthInfoDto } from './dto/returned-auth-info.dto';
 import { JWTUserGuard } from './guards/user.guard';
 
 @Controller('auth')
@@ -20,7 +29,10 @@ export class AuthController {
 
   // create swagger api documentation
   @ApiOperation({ summary: 'Sign up new user' })
-  @ApiOkResponse({ description: 'User successfully signed up' })
+  @ApiOkResponse({
+    description: 'User successfully signed up',
+    type: ReturnedAuthInfoDto,
+  })
   @ApiBadRequestResponse({ description: "Can't create user" })
   @Post('signup')
   signup(@Body() dto: CreateUserDto) {
@@ -28,7 +40,10 @@ export class AuthController {
   }
 
   @ApiOperation({ summary: 'login to the website' })
-  @ApiOkResponse({ description: 'User successfully logged in' })
+  @ApiOkResponse({
+    description: 'User successfully logged in',
+    type: ReturnedAuthInfoDto,
+  })
   @ApiUnauthorizedResponse({ description: 'wrong credentials' })
   @ApiBadRequestResponse({ description: 'user already logged in' })
   @Post('login')
@@ -43,7 +58,32 @@ export class AuthController {
   @UseGuards(JWTUserGuard)
   @Post('logout')
   logout(@Req() req: any) {
-    console.log(req.user);
     return this.authService.logout(req.user._id);
+  }
+
+  @ApiOperation({
+    summary:
+      "request to send OTP(one time password) to be used to verifiy that it's you",
+  })
+  @ApiOkResponse({ description: 'OTP successfully sent' })
+  @ApiNotFoundResponse({ description: 'user not found' })
+  @Post('forget-password')
+  forgotPassword(@Body() dto: ForgetPasswordDto) {
+    return this.authService.forgetPassword(dto.phoneNumber);
+  }
+
+  @ApiOperation({ summary: 'verify OTP(one time password)' })
+  @ApiOkResponse({ description: 'OTP successfully verified' })
+  @ApiNotFoundResponse({ description: 'user not found' })
+  @Post('verify-otp')
+  // @Throttle(3, 5 * 60)
+  verifyOTP(@Body() dto: VerifyOTPDto) {
+    return this.authService.verifyOTP(dto);
+  }
+
+  @Post('reset-password')
+  // @Throttle(3, 5 * 60)
+  resetPassword(@Body() dto: ResetPasswordDto) {
+    return this.authService.resetPassword(dto);
   }
 }

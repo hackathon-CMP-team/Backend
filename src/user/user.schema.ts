@@ -30,12 +30,19 @@ export class User {
   @Prop({ default: 0 })
   balance: number;
 
-  @Prop({ default: Date.now })
-  dateOfBirh: Date;
+  @Prop({ required: true })
+  dateOfBirth: Date;
 
   @Prop({ default: null })
   parentPhoneNumber: string;
+
+  @Prop({ default: null })
+  otp: string;
+
+  @Prop({ default: null })
+  otpWillExpireAt: number;
 }
+
 export const UserSchema = SchemaFactory.createForClass(User);
 UserSchema.methods.comparePassword = async function (hashPassword: string) {
   return bcrypt.compare(hashPassword, this.password);

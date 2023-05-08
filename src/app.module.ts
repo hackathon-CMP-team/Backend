@@ -7,6 +7,7 @@ import { TransactionModule } from './transaction/transaction.module';
 import { WalletModule } from './wallet/wallet.module';
 import { ChildrenModule } from './children/children.module';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ThrottlerModule } from '@nestjs/throttler';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -20,6 +21,10 @@ import { MailerModule } from '@nestjs-modules/mailer';
         },
       },
     }),
+    // ThrottlerModule.forRoot({
+    //   ttl: 60,
+    //   limit: 3,
+    // }),
     UserModule,
     AuthModule,
     TransactionModule,

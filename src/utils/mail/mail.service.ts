@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -30,12 +31,10 @@ export class EmailService {
         to: toMail,
         from: process.env.EMAIL_USER,
         subject,
-        text: body,
+        html: body,
       });
     } catch (error) {
-      throw new InternalServerErrorException(
-        error.message || 'Failed to send mail',
-      );
+      throw new BadRequestException('Failed to send mail');
     }
   };
 }

@@ -1,6 +1,6 @@
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
-import { EmailService } from 'src/utils/mail/mail.service';
+import { EmailService } from '../../utils/mail/mail.service';
 import { UserModule } from '../../user/user.module';
 import { User, UserSchema } from '../../user/user.schema';
 import { UserService } from '../../user/user.service';

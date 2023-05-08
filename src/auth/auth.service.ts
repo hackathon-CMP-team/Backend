@@ -12,7 +12,7 @@ import { LoginDto } from './dto/login.dto';
 import * as bcrypt from 'bcrypt';
 import { promisify } from 'util';
 import { Types } from 'mongoose';
-import { EmailService } from 'src/utils/mail/mail.service';
+import { EmailService } from '../utils/mail/mail.service';
 import { ResetPasswordDto, VerifyOTPDto } from './dto/forget-password.dto';
 
 @Injectable()

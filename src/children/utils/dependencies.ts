@@ -17,7 +17,7 @@ import {
 import { JwtService } from '@nestjs/jwt';
 import { ChildrenController } from '../children.controller';
 import { ChildrenService } from '../children.service';
-import { WalletService } from 'src/wallet/wallet.service';
+import { WalletService } from '../wallet/wallet.service';
 
 export const ChildrernDependingModules = [
   MongooseModule.forFeature([
@@ -56,5 +56,5 @@ export const ChildrernDependingServices = [
   UserService,
   JwtService,
   ChildrenService,
-  WalletService
+  WalletService,
 ];

@@ -1,9 +1,5 @@
-import { ConfigModule } from '@nestjs/config';
 import { Test, TestingModule } from '@nestjs/testing';
-import {
-  closeInMongodConnection,
-  rootMongooseTestModule,
-} from '../utils/mongoose-in-memory';
+import { closeInMongodConnection } from '../utils/mongoose-in-memory';
 import { UserService } from '../user/user.service';
 import { AuthService } from './auth.service';
 import {
@@ -11,6 +7,8 @@ import {
   AuthDependingModules,
   AuthDependingServices,
 } from './utils/dependencies';
+import { UserGender, UserRole } from '../user/user.schema';
+import { testDependingModules } from '../utils/test-dependencies';
 
 describe('AuthService', () => {
   let service: AuthService;
@@ -21,14 +19,13 @@ describe('AuthService', () => {
     phoneNumber: '01033304427',
     email: 'email@example.com',
     password: 'password',
+    gender: UserGender.MALE,
+    role: UserRole.PARENT,
+    dateOfBirth: new Date(),
   };
   beforeAll(async () => {
     module = await Test.createTestingModule({
-      imports: [
-        ConfigModule.forRoot(),
-        rootMongooseTestModule(),
-        ...AuthDependingModules,
-      ],
+      imports: [...testDependingModules, ...AuthDependingModules],
       controllers: AuthDependingControllers,
       providers: AuthDependingServices,
     }).compile();

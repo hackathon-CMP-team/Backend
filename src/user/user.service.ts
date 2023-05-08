@@ -12,7 +12,7 @@ import * as bcrypt from 'bcrypt';
 import {
   ResetPasswordDto,
   VerifyOTPDto,
-} from 'src/auth/dto/forget-password.dto';
+} from '../auth/dto/forget-password.dto';
 
 @Injectable()
 export class UserService {

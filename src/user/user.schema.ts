@@ -8,9 +8,9 @@ export enum UserRole {
   CHILD = 'child',
 }
 
-export enum GenderRole {
-  male = 'male',
-  female = 'female',
+export enum UserGender {
+  MALE = 'male',
+  FEMALE = 'female',
 }
 
 @Schema()
@@ -18,7 +18,7 @@ export class User {
   @Prop({ default: 'parent', enum: UserRole })
   role: string;
 
-  @Prop({ required: true, enum: GenderRole })
+  @Prop({ required: true, enum: UserGender })
   gender: string;
 
   @Prop({ required: true, unique: true })

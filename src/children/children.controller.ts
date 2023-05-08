@@ -14,9 +14,9 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JWTParentGuard } from 'src/auth/guards/parent.guard';
-import { ReturnedTransactionDto } from 'src/transaction/dto/returned-transaction.dto';
-import { ReturnedBalanceDto } from 'src/wallet/dto/returned-balance.dto';
+import { JWTParentGuard } from '../auth/guards/parent.guard';
+import { ReturnedTransactionDto } from '../transaction/dto/returned-transaction.dto';
+import { ReturnedBalanceDto } from '../wallet/dto/returned-balance.dto';
 import { ChildrenService } from './children.service';
 import { ChildInfoDto, ReturnedChildInfoDto } from './dto/child-info.dto';
 

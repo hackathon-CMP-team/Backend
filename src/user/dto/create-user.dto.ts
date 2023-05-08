@@ -10,7 +10,7 @@ import {
   MinLength,
   ValidateBy,
 } from 'class-validator';
-import { UserRole } from '../user.schema';
+import { UserGender, UserRole } from '../user.schema';
 
 export class CreateUserDto {
   @IsEmail(undefined, { message: 'must be a valid email' })
@@ -38,5 +38,6 @@ export class CreateUserDto {
   @ApiProperty({ description: 'role of the user' })
   role: string;
 
+  @IsEnum(UserGender)
   gender: string;
 }

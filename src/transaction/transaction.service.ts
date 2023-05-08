@@ -229,10 +229,8 @@ export class TransactionService {
 
   async requestMoney(phoneNumber: string, dto: RequestMoneyDto) {
     const { amount, senderPhone } = dto;
-    const { role } = await this.userService.getUserByPhoneNumber(
-      dto.senderPhone,
-    );
-    if (role === UserRole.CHILD) {
+    const user = await this.userService.getUserByPhoneNumber(dto.senderPhone);
+    if (user?.role === UserRole.CHILD) {
       throw new BadRequestException('you cannot request money from a child');
     }
     await this.transactionRequestMoneyModel.create({

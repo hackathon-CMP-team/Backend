@@ -163,7 +163,12 @@ export class TransactionService {
         $project: {
           amount: {
             $cond: {
-              if: { $eq: ['$type', TransactionVirtualVisa.name] },
+              if: {
+                $or: [
+                  { $eq: ['$type', TransactionVirtualVisa.name] },
+                  { $eq: ['$type', transactionRequestMoney.name] },
+                ],
+              },
               then: 0,
               else: '$amount',
             },

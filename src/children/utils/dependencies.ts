@@ -20,7 +20,7 @@ import { JwtService } from '@nestjs/jwt';
 import { ChildrenController } from '../children.controller';
 import { ChildrenService } from '../children.service';
 import { WalletService } from '../../wallet/wallet.service';
-import { TransactionDiscriminators } from 'src/transaction/utils/dependencies';
+import { TransactionDiscriminators } from '../../transaction/utils/dependencies';
 export const ChildrernDependingModules = [
   MongooseModule.forFeature([
     {

@@ -61,6 +61,6 @@ export class CreateUserDto {
 
   @ValidateIf((o) => o.role === UserRole.CHILD)
   @IsString()
-  @ApiProperty({ example: '01700000000', description: 'parent phone number' })
+  @ApiProperty({ example: '01033304427', description: 'parent phone number' })
   parentPhoneNumber?: string;
 }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ConfigModule } from '@nestjs/config';
 import { UserModule } from './user/user.module';
@@ -9,6 +9,7 @@ import { ChildrenModule } from './children/children.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NotificationsModule } from './notifications/notifications.module';
+import { EgyptianPhoneNumberMiddleWare } from './utils/middlewares/egyptian-phone-number-format';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -36,4 +37,8 @@ import { NotificationsModule } from './notifications/notifications.module';
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(EgyptianPhoneNumberMiddleWare).forRoutes('*');
+  }
+}

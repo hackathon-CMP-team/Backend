@@ -5,6 +5,7 @@ import {
   closeInMongodConnection,
   rootMongooseTestModule,
 } from '../utils/mongoose-in-memory';
+import { UserGender, UserRole } from './user.schema';
 import { UserService } from './user.service';
 import {
   UserDependingControllers,
@@ -18,12 +19,18 @@ describe('UserService', () => {
     password: 'password',
     name: 'omar',
     phoneNumber: '01032332843',
+    role: UserRole.PARENT,
+    gender: UserGender.MALE,
+    dateOfBirth: new Date(),
   };
   const userInfo2 = {
     email: 'user2@example.com',
     password: 'password',
     name: 'omar',
     phoneNumber: '01032332844',
+    role: UserRole.PARENT,
+    gender: UserGender.MALE,
+    dateOfBirth: new Date(),
   };
   let service: UserService;
   let module: TestingModule;

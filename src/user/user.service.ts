@@ -40,6 +40,7 @@ export class UserService {
     if (!user) throw new NotFoundException('phone number not exists');
     return user;
   }
+
   async create(dto: CreateUserDto) {
     const password = await bcrypt.hash(dto.password, await bcrypt.genSalt(10));
     const user = await this.userModel.create({ ...dto, password });

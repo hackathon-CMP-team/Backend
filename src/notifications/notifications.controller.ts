@@ -2,6 +2,7 @@ import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import {
   ApiOkResponse,
   ApiOperation,
+  ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import { JWTUserGuard } from '../auth/guards/user.guard';
@@ -9,6 +10,7 @@ import { ReturnedTransactionDto } from '../transaction/dto/returned-transaction.
 import { NotificationsService } from './notifications.service';
 
 @Controller('notifications')
+@ApiTags('notifications')
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 

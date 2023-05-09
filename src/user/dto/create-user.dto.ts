@@ -14,6 +14,7 @@ import {
   ValidateIf,
   ValidationArguments,
 } from 'class-validator';
+import { phoneNumberValidationObject } from 'src/utils/middlewares/egyptian-phone-number-format';
 import { UserGender, UserRole } from '../user.schema';
 
 export class CreateUserDto {
@@ -23,17 +24,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @ApiProperty({ description: 'phone number of the user' })
-  @ValidateBy({
-    name: 'isEgyptianPhoneNumber',
-    validator: {
-      validate: (value: string) => {
-        return /^01[0125][0-9]{8}$/.test(value);
-      },
-      defaultMessage: (args: ValidationArguments) => {
-        return `${args.value} must be a valid egyptian phone number`;
-      },
-    },
-  })
+  @ValidateBy(phoneNumberValidationObject)
   readonly phoneNumber: string;
 
   @ApiProperty({ description: 'password of the user', example: '123456' })
@@ -73,6 +64,7 @@ export class CreateUserDto {
 
   @ValidateIf((o) => o.role === UserRole.CHILD)
   @IsString()
+  @ValidateBy(phoneNumberValidationObject)
   @ApiProperty({ example: '01033304427', description: 'parent phone number' })
   parentPhoneNumber?: string;
 }

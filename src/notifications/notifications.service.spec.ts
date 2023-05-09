@@ -1,12 +1,20 @@
 import { Test, TestingModule } from '@nestjs/testing';
+import { testDependingModules } from 'src/utils/test-dependencies';
 import { NotificationsService } from './notifications.service';
+import {
+  NotificationDependingControllers,
+  NotificationDependingModules,
+  NotificationDependingServices,
+} from './utils/dependencies';
 
 describe('NotificationsService', () => {
   let service: NotificationsService;
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
-      providers: [NotificationsService],
+      imports: [...testDependingModules, ...NotificationDependingModules],
+      controllers: NotificationDependingControllers,
+      providers: NotificationDependingServices,
     }).compile();
 
     service = module.get<NotificationsService>(NotificationsService);

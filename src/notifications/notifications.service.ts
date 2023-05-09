@@ -5,11 +5,7 @@ import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class NotificationsService {
-  constructor(
-    private readonly userService: UserService,
-    private readonly transactionService: TransactionService,
-    private readonly childrenService: ChildrenService,
-  ) {}
+  constructor(private readonly transactionService: TransactionService) {}
   getMyNotifications(phoneNumber: string) {
     return this.transactionService.getNotificationOf(phoneNumber);
   }

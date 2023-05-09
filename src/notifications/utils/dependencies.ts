@@ -10,7 +10,6 @@ import { JwtService } from '@nestjs/jwt';
 import { TransactionDiscriminators } from '../../transaction/utils/dependencies';
 import { NotificationsService } from '../notifications.service';
 import { NotificationsController } from '../notifications.controller';
-import { ChildrenService } from '../../children/children.service';
 
 export const NotificationDependingModules = [
   MongooseModule.forFeature([
@@ -30,7 +29,6 @@ export const NotificationDependingControllers = [NotificationsController];
 export const NotificationDependingServices = [
   TransactionService,
   UserService,
-  ChildrenService,
   JwtService,
   NotificationsService,
 ];

@@ -7,8 +7,11 @@ import {
   IsEnum,
   IsNotEmpty,
   IsString,
+  Length,
+  maxLength,
   MinLength,
   ValidateBy,
+  ValidateIf,
 } from 'class-validator';
 import { UserGender, UserRole } from '../user.schema';
 
@@ -21,23 +24,43 @@ export class CreateUserDto {
   @ApiProperty({ description: 'phone number of the user' })
   readonly phoneNumber: string;
 
-  @MinLength(8, { message: 'Password Must have at least 8 characters' })
-  @ApiProperty({ description: 'password of the user' })
+  @ApiProperty({ description: 'password of the user', example: '123456' })
+  @Length(6, 6, { message: 'password must be 6 digit number' })
+  @ValidateBy({
+    name: 'isNumberString',
+    validator: {
+      validate: (value: string) => {
+        return !isNaN(Number(value));
+      },
+      defaultMessage: (args) => {
+        return `password ${args.value} is not valid, it must be a 6-digit number`;
+      },
+    },
+  })
   readonly password: string;
 
   @IsString()
   @IsNotEmpty()
-  @ApiProperty({ description: 'name of the user' })
+  @ApiProperty({ description: 'name of the user', example: 'omar' })
   name: string;
 
   @IsDateString()
-  @ApiProperty({ description: 'date of birth of the user' })
+  @ApiProperty({
+    description: 'date of birth of the user',
+    example: new Date(),
+  })
   dateOfBirth: Date;
 
   @IsEnum(UserRole)
-  @ApiProperty({ description: 'role of the user' })
-  role: string;
+  @ApiProperty({ description: 'role of the user', example: UserRole.PARENT })
+  role: UserRole;
 
   @IsEnum(UserGender)
+  @ApiProperty({ example: 'male', description: 'gender of the user' })
   gender: string;
+
+  @ValidateIf((o) => o.role === UserRole.CHILD)
+  @IsString()
+  @ApiProperty({ example: '01700000000', description: 'parent phone number' })
+  parentPhoneNumber?: string;
 }

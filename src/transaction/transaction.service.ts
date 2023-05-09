@@ -40,11 +40,19 @@ export class TransactionService {
     private readonly userService: UserService,
   ) {}
 
+  /**
+
+    Transfers a given amount from one user's balance to another user's balance
+    @param senderPhone - The phone number of the user sending the money
+    @param receiverPhone - The phone number of the user receiving the money
+    @param amount - The amount to be transferred
+    @returns {Promise<{status: string}>}A Promise that resolves to an object with a status key and value of "success"
+    */
   async transfer(
     senderPhone: string,
     receiverPhone: string,
     amount: number,
-  ): Promise<any> {
+  ): Promise<{ status: string }> {
     await this.userService.moveBalance(senderPhone, receiverPhone, amount);
     await this.transactionTransferModel.create({
       userPhone: senderPhone,
@@ -55,6 +63,11 @@ export class TransactionService {
     return { status: 'success' };
   }
 
+  /**
+
+    Generates a random 16-digit card number
+    @returns A string representing the randomly generated card number
+    */
   private generateCardNumber() {
     let cardNumber = '';
     for (let i = 0; i < 4; i++) {
@@ -64,13 +77,27 @@ export class TransactionService {
     }
     return cardNumber;
   }
+
+  /**
+    Generates a random 16-digit card number
+    @returns A string representing the randomly generated card number
+    */
   private generateCVV() {
     return Math.floor(Math.random() * 1000)
       .toString()
       .padStart(3, '0');
   }
 
-  async buyUsingVirtualCard(dto: BuyUsingVirtualCardDto) {
+  /**
+    Buys a product using a virtual visa card
+    @param dto - An object containing the required data to complete the purchase
+    @returns {Promise<{status: string}>}A Promise that resolves to an object with a status key and value of "success"
+    @throws BadRequestException if the card number or CVV are invalid, if the user is not allowed to buy the category of the product,
+    if the card is expired or if the card has insufficient balance
+    */
+  async buyUsingVirtualCard(
+    dto: BuyUsingVirtualCardDto,
+  ): Promise<{ status: string }> {
     const { cardNumber, cvv, amount, category, product } = dto;
     const card = await this.transactionVirtualVisaModel.findOne({
       cardNumber,
@@ -114,6 +141,14 @@ export class TransactionService {
     });
     return { status: 'success' };
   }
+
+  /**
+
+    Creates a virtual Visa card for the user and adds the details to the virtual transaction model.
+    @param phoneNumber The phone number of the user creating the virtual card.
+    @param dto An object containing the amount to add to the virtual card.
+    @returns An object containing the newly created card number and CVV code.
+    */
   async createVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     const cardNumber = this.generateCardNumber();
@@ -128,6 +163,7 @@ export class TransactionService {
     return { cardNumber, cvv };
   }
 
+  
   async sendVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     const { cardNumber, cvv } = await this.createVirtualCard(phoneNumber, dto);
     return { status: 'success' };

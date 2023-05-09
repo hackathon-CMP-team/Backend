@@ -40,11 +40,19 @@ export class TransactionService {
     private readonly userService: UserService,
   ) {}
 
+  /**
+
+    Transfers a given amount from one user's balance to another user's balance
+    @param senderPhone - The phone number of the user sending the money
+    @param receiverPhone - The phone number of the user receiving the money
+    @param amount - The amount to be transferred
+    @returns {Promise<{status: string}>}A Promise that resolves to an object with a status key and value of "success"
+    */
   async transfer(
     senderPhone: string,
     receiverPhone: string,
     amount: number,
-  ): Promise<any> {
+  ): Promise<{ status: string }> {
     await this.userService.moveBalance(senderPhone, receiverPhone, amount);
     await this.transactionTransferModel.create({
       userPhone: senderPhone,
@@ -55,6 +63,11 @@ export class TransactionService {
     return { status: 'success' };
   }
 
+  /**
+
+    Generates a random 16-digit card number
+    @returns A string representing the randomly generated card number
+    */
   private generateCardNumber() {
     let cardNumber = '';
     for (let i = 0; i < 4; i++) {
@@ -64,13 +77,27 @@ export class TransactionService {
     }
     return cardNumber;
   }
+
+  /**
+    Generates a random 16-digit card number
+    @returns A string representing the randomly generated card number
+    */
   private generateCVV() {
     return Math.floor(Math.random() * 1000)
       .toString()
       .padStart(3, '0');
   }
 
-  async buyUsingVirtualCard(dto: BuyUsingVirtualCardDto) {
+  /**
+    Buys a product using a virtual visa card
+    @param dto - An object containing the required data to complete the purchase
+    @returns {Promise<{status: string}>}A Promise that resolves to an object with a status key and value of "success"
+    @throws BadRequestException if the card number or CVV are invalid, if the user is not allowed to buy the category of the product,
+    if the card is expired or if the card has insufficient balance
+    */
+  async buyUsingVirtualCard(
+    dto: BuyUsingVirtualCardDto,
+  ): Promise<{ status: string }> {
     const { cardNumber, cvv, amount, category, product } = dto;
     const card = await this.transactionVirtualVisaModel.findOne({
       cardNumber,
@@ -114,6 +141,14 @@ export class TransactionService {
     });
     return { status: 'success' };
   }
+
+  /**
+
+    Creates a virtual Visa card for the user and adds the details to the virtual transaction model.
+    @param phoneNumber The phone number of the user creating the virtual card.
+    @param dto An object containing the amount to add to the virtual card.
+    @returns An object containing the newly created card number and CVV code.
+    */
   async createVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     const cardNumber = this.generateCardNumber();
@@ -128,11 +163,24 @@ export class TransactionService {
     return { cardNumber, cvv };
   }
 
+  /**
+
+    Sends a virtual Visa card to a user.
+    @param phoneNumber The phone number of the user sending the virtual card.
+    @param dto An object containing the amount to add to the virtual card.
+    @returns An object indicating the success of the virtual card transfer.
+  */
   async sendVirtualCard(phoneNumber: string, dto: VirtualCardDto) {
     const { cardNumber, cvv } = await this.createVirtualCard(phoneNumber, dto);
     return { status: 'success' };
   }
 
+  /**
+    Withdraws an amount of money from the user's balance and logs the transaction in the transaction model.
+    @param phoneNumber The phone number of the user withdrawing the money.
+    @param dto An object containing the amount to withdraw.
+    @returns An object indicating the success of the withdrawal.
+  */
   async withdraw(phoneNumber: string, dto: WithdrawDto) {
     await this.userService.reduceBalance(phoneNumber, dto.amount);
     await this.transactionWithdrawModel.create({
@@ -143,6 +191,13 @@ export class TransactionService {
 
     return { status: 'success' };
   }
+
+  /**
+
+    Gets the total income of a user.
+    @param phoneNumber The phone number of the user to retrieve the income of.
+    @returns The total income of the user.
+    */
   async getIncome(phoneNumber: string): Promise<number> {
     const res = await this.transactionTransferModel.aggregate([
       {
@@ -160,6 +215,11 @@ export class TransactionService {
     return res.length ? res[0].total : 0;
   }
 
+  /**
+    Gets the total outcome of a user.
+    @param phoneNumber The phone number of the user to retrieve the outcome of.
+    @returns The total outcome of the user.
+  */
   async getOutcome(phoneNumber: string) {
     const res = await this.transactionModel.aggregate([
       {
@@ -192,6 +252,7 @@ export class TransactionService {
     ]);
     return res.length ? res[0].totalOutcome : 0;
   }
+
   selectSomeTransactions(condition: any) {
     return this.transactionModel.find(condition).select({
       type: 1,
@@ -205,11 +266,25 @@ export class TransactionService {
       categoty: 1,
     });
   }
+
+  /**
+    Retrieves all transactions associated with a user's phone number.
+    @param phoneNumber - The phone number of the user.
+    @returns A list of transactions.
+  */
   getUserTransactions(phoneNumber: string) {
     return this.selectSomeTransactions({
       $or: [{ userPhone: phoneNumber }, { receiverPhone: phoneNumber }],
     });
   }
+
+  /**
+
+    Returns the balance of unused virtual visa transactions that have expired and belong to the user with the given phone number.
+    @param phoneNumber - The phone number of the user.
+    @returns The total amount of unused money returned by expired virtual visa transactions.
+    @throws An InternalServerErrorException if there is an error in returning the money.
+    */
   async getReturnedBalance(phoneNumber: string): Promise<number> {
     try {
       const res = await this.transactionVirtualVisaModel
@@ -241,6 +316,13 @@ export class TransactionService {
     }
   }
 
+  /**
+    Creates a new transaction for requesting money and saves it in the database.
+    @param phoneNumber - The phone number of the user making the request.
+    @param dto - The details of the request.
+    @returns A status indicating the success of the operation.
+    @throws A BadRequestException if the user is a child and therefore cannot request money.
+    */
   async requestMoney(phoneNumber: string, dto: RequestMoneyDto) {
     const { amount, senderPhone } = dto;
     const user = await this.userService.getUserByPhoneNumber(dto.senderPhone);
@@ -256,6 +338,13 @@ export class TransactionService {
     return { status: 'success' };
   }
 
+  /**
+    Accepts a request for money by updating the status of the corresponding transaction to "ACCEPTED" and transferring the requested amount from the sender to the requester.
+    @param phoneNumber - The phone number of the user receiving the request.
+    @param dto - The details of the request response.
+    @returns A status indicating the success of the operation.
+    @throws A BadRequestException if the request is invalid or if the user has insufficient balance to accept the transaction.
+    */
   async acceptRequest(phoneNumber: string, dto: ResponseToRequestDto) {
     const transaction =
       await this.transactionRequestMoneyModel.findOneAndUpdate(
@@ -285,6 +374,15 @@ export class TransactionService {
     return { status: 'success' };
   }
 
+  /**
+   * Rejects a money request with the given requestId and updates its status to REJECTED.
+   * Throws a BadRequestException if the request is not found or if its status is not PENDING.
+   *
+   * @param phoneNumber The phone number of the sender who made the money request.
+   * @param dto The ResponseToRequestDto object containing the requestId and the phone number of the requester.
+   *
+   * @returns An object with a status property set to 'success'.
+   */
   async rejectRequest(phoneNumber: string, dto: ResponseToRequestDto) {
     const transaction =
       await this.transactionRequestMoneyModel.findOneAndUpdate(
@@ -302,6 +400,14 @@ export class TransactionService {
     return { status: 'success' };
   }
 
+  /**
+   * Returns a list of transactions that the given phoneNumber is involved in. This includes transactions where the
+   * given phoneNumber is the sender, the user, or the receiver, and their status is PENDING.
+   *
+   * @param phoneNumber The phone number to search transactions for.
+   *
+   * @returns An array of transactions that match the search criteria.
+   */
   async getNotificationOf(phoneNumber: string) {
     const childPhones = (await this.userService.getChildren(phoneNumber)).map(
       (child) => child.phoneNumber,

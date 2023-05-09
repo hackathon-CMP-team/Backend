@@ -10,6 +10,7 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
 import { NotificationsModule } from './notifications/notifications.module';
 import { EgyptianPhoneNumberMiddleWare } from './utils/middlewares/egyptian-phone-number-format';
+import { LoggerMiddleware } from './utils/middlewares/logger';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -39,6 +40,8 @@ import { EgyptianPhoneNumberMiddleWare } from './utils/middlewares/egyptian-phon
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(EgyptianPhoneNumberMiddleWare).forRoutes('*');
+    consumer
+      .apply(EgyptianPhoneNumberMiddleWare, LoggerMiddleware)
+      .forRoutes('*');
   }
 }

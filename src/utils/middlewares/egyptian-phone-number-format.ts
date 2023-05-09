@@ -5,10 +5,10 @@ export const phoneNumberValidationObject = {
   name: 'isValidPhoneNumber',
   validator: {
     validate: (value: string) => {
-      return /^(\+|0)?(20)?(10\d{8})$/.test(value);
+      return /^(\+|0)?(20)?(1[0125]\d{8})$/.test(value);
     },
     defaultMessage: (args: ValidationArguments) => {
-      return `password ${args.value} is not valid, it must be an Egyptian phone number`;
+      return `phone number ${args.value} is not valid, it must be an Egyptian phone number`;
     },
   },
 };

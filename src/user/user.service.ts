@@ -204,7 +204,7 @@ export class UserService {
    * @returns A Promise that resolves to an object containing a success status if the password reset is successful.
    * @throws NotFoundException if the user with the provided phone number is not found.
    * @throws UnauthorizedException if the OTP is invalid or expired.
-   */
+  */
   async resetPassword(dto: ResetPasswordDto) {
     const user = await this.userModel.findOne({
       phoneNumber: dto.phoneNumber,

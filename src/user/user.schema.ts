@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 export type UserDocument = User & Document;
 import * as bcrypt from 'bcrypt';
+import { ValidateBy, ValidationArguments } from 'class-validator';
 
 export enum UserRole {
   PARENT = 'parent',

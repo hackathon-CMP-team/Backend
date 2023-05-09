@@ -12,7 +12,9 @@ import {
   MinLength,
   ValidateBy,
   ValidateIf,
+  ValidationArguments,
 } from 'class-validator';
+import { phoneNumberValidationObject } from 'src/utils/middlewares/egyptian-phone-number-format';
 import { UserGender, UserRole } from '../user.schema';
 
 export class CreateUserDto {
@@ -22,6 +24,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @ApiProperty({ description: 'phone number of the user' })
+  @ValidateBy(phoneNumberValidationObject)
   readonly phoneNumber: string;
 
   @ApiProperty({ description: 'password of the user', example: '123456' })
@@ -32,7 +35,7 @@ export class CreateUserDto {
       validate: (value: string) => {
         return !isNaN(Number(value));
       },
-      defaultMessage: (args) => {
+      defaultMessage: (args: ValidationArguments) => {
         return `password ${args.value} is not valid, it must be a 6-digit number`;
       },
     },
@@ -61,6 +64,7 @@ export class CreateUserDto {
 
   @ValidateIf((o) => o.role === UserRole.CHILD)
   @IsString()
+  @ValidateBy(phoneNumberValidationObject)
   @ApiProperty({ example: '01033304427', description: 'parent phone number' })
   parentPhoneNumber?: string;
 }

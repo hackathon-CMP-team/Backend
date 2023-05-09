@@ -7,11 +7,11 @@ import {
   TransactionSchema,
 } from '../../transaction/transaction.schema';
 import { JwtService } from '@nestjs/jwt';
-import { WalletController } from '../wallet.controller';
-import { WalletService } from '../wallet.service';
 import { TransactionDiscriminators } from '../../transaction/utils/dependencies';
+import { NotificationsService } from '../notifications.service';
+import { NotificationsController } from '../notifications.controller';
 
-export const WalletDependingModules = [
+export const NotificationDependingModules = [
   MongooseModule.forFeature([
     {
       name: User.name,
@@ -25,10 +25,10 @@ export const WalletDependingModules = [
   ]),
 ];
 
-export const WalletDependingControllers = [WalletController];
-export const WalletDependingServices = [
+export const NotificationDependingControllers = [NotificationsController];
+export const NotificationDependingServices = [
   TransactionService,
   UserService,
   JwtService,
-  WalletService,
+  NotificationsService,
 ];

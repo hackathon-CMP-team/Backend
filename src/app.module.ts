@@ -8,6 +8,7 @@ import { WalletModule } from './wallet/wallet.module';
 import { ChildrenModule } from './children/children.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { NotificationsModule } from './notifications/notifications.module';
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -30,6 +31,7 @@ import { ThrottlerModule } from '@nestjs/throttler';
     TransactionModule,
     WalletModule,
     ChildrenModule,
+    NotificationsModule,
   ],
   controllers: [],
   providers: [],

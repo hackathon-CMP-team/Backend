@@ -306,10 +306,12 @@ export class TransactionService {
     const childPhones = (await this.userService.getChildren(phoneNumber)).map(
       (child) => child.phoneNumber,
     );
+    console.log(childPhones);
     return this.selectSomeTransactions({
       $or: [
         { senderPhone: phoneNumber, status: RequestMoneyStatus.PENDING },
         { userPhone: { $in: childPhones } },
+        { receiverPhone: { $in: childPhones } },
       ],
     });
   }

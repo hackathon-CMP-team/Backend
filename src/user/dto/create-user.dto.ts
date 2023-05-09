@@ -12,6 +12,7 @@ import {
   MinLength,
   ValidateBy,
   ValidateIf,
+  ValidationArguments,
 } from 'class-validator';
 import { UserGender, UserRole } from '../user.schema';
 
@@ -22,6 +23,17 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @ApiProperty({ description: 'phone number of the user' })
+  @ValidateBy({
+    name: 'isEgyptianPhoneNumber',
+    validator: {
+      validate: (value: string) => {
+        return /^01[0125][0-9]{8}$/.test(value);
+      },
+      defaultMessage: (args: ValidationArguments) => {
+        return `${args.value} must be a valid egyptian phone number`;
+      },
+    },
+  })
   readonly phoneNumber: string;
 
   @ApiProperty({ description: 'password of the user', example: '123456' })
@@ -32,7 +44,7 @@ export class CreateUserDto {
       validate: (value: string) => {
         return !isNaN(Number(value));
       },
-      defaultMessage: (args) => {
+      defaultMessage: (args: ValidationArguments) => {
         return `password ${args.value} is not valid, it must be a 6-digit number`;
       },
     },

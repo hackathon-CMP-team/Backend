@@ -10,7 +10,6 @@ import {
   NotificationDependingModules,
   NotificationDependingServices,
 } from './utils/dependencies';
-import { TransactionTransfer } from '../transaction/transaction.schema';
 
 describe('NotificationsService', () => {
   let service: NotificationsService;

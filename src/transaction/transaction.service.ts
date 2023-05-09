@@ -4,7 +4,7 @@ import {
   InternalServerErrorException,
 } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Query, Types } from 'mongoose';
 import { UserRole } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
@@ -184,23 +184,23 @@ export class TransactionService {
     ]);
     return res.length ? res[0].totalOutcome : 0;
   }
+  selectSomeTransactions(condition: any) {
+    return this.transactionModel.find(condition).select({
+      type: 1,
+      amount: 1,
+      date: 1,
+      userPhone: 1,
+      receiverPhone: 1,
+      usedAmount: 1,
+      usedAt: 1,
+      product: 1,
+      categoty: 1,
+    });
+  }
   getUserTransactions(phoneNumber: string) {
-    return this.transactionModel
-      .find({
-        $or: [{ userPhone: phoneNumber }, { receiverPhone: phoneNumber }],
-      })
-      .select({
-        type: 1,
-        amount: 1,
-        date: 1,
-        userPhone: 1,
-        receiverPhone: 1,
-        usedAmount: 1,
-        usedAt: 1,
-        product: 1,
-        categoty: 1,
-        _id: 1,
-      });
+    return this.selectSomeTransactions({
+      $or: [{ userPhone: phoneNumber }, { receiverPhone: phoneNumber }],
+    });
   }
   async getReturnedBalance(phoneNumber: string): Promise<number> {
     try {
@@ -292,5 +292,17 @@ export class TransactionService {
       throw new BadRequestException('Invalid request');
     }
     return { status: 'success' };
+  }
+
+  async getNotificationOf(phoneNumber: string) {
+    const childPhones = (await this.userService.getChildren(phoneNumber)).map(
+      (child) => child.phoneNumber,
+    );
+    return this.selectSomeTransactions({
+      $or: [
+        { senderPhone: phoneNumber, status: RequestMoneyStatus.PENDING },
+        { userPhone: { $in: childPhones } },
+      ],
+    });
   }
 }

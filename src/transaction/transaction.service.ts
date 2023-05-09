@@ -79,12 +79,20 @@ export class TransactionService {
     if (!card) {
       throw new BadRequestException('Invalid card number or CVV');
     }
+
+    const user = await this.userService.getUserByPhoneNumber(card.userPhone);
+    if (category in user.forbiddenCategories) {
+      throw new BadRequestException('user not allowed to buy this category');
+    }
+
     if (card.visaWillExpireAt < Date.now()) {
       throw new BadRequestException('Card expired');
     }
+
     if (card.usedAmount + amount > card.amount) {
       throw new BadRequestException('Insufficient balance');
     }
+
     const updatedOne = await this.transactionVirtualVisaModel.findOneAndUpdate(
       { cardNumber, cvv },
       { $inc: { usedAmount: amount } },

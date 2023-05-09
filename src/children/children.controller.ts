@@ -3,6 +3,7 @@ import {
   Controller,
   Get,
   NotFoundException,
+  Put,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -19,6 +20,7 @@ import { ReturnedTransactionDto } from '../transaction/dto/returned-transaction.
 import { ReturnedBalanceDto } from '../wallet/dto/returned-balance.dto';
 import { ChildrenService } from './children.service';
 import { ChildInfoDto, ReturnedChildInfoDto } from './dto/child-info.dto';
+import { ForbiddenCategoriesDto } from './dto/forbidden-categries.dto';
 
 @Controller('children')
 @ApiTags('children')
@@ -94,5 +96,44 @@ export class ChildrenController {
   @Get('me')
   getChildren(@Req() req: any) {
     return this.childrenService.getChildren(req.user.phoneNumber);
+  }
+
+  // add swagger docs
+  @ApiOperation({ summary: 'add forbidden category to a child' })
+  @ApiOkResponse({
+    description: 'operation successfully done',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is not a parent',
+  })
+  @ApiNotFoundResponse({
+    description: 'child not found, or you are not the parent of this child',
+  })
+  @UseGuards(JWTParentGuard)
+  @Put('forbidden-categories')
+  addForbiddenCategories(@Req() req: any, @Body() dto: ForbiddenCategoriesDto) {
+    return this.childrenService.addForbiddenCategories(
+      req.user.phoneNumber,
+      dto,
+    );
+  }
+
+  @ApiOperation({ summary: 'get child forbidden categries' })
+  @ApiOkResponse({
+    description: 'operation successfully done',
+  })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is not a parent',
+  })
+  @ApiNotFoundResponse({
+    description: 'child not found, or you are not the parent of this child',
+  })
+  @UseGuards(JWTParentGuard)
+  @Get('forbidden-categories')
+  getForbiddenCategories(@Req() req: any, @Body() dto: ChildInfoDto) {
+    return this.childrenService.getForbiddenCategories(
+      req.user.phoneNumber,
+      dto,
+    );
   }
 }

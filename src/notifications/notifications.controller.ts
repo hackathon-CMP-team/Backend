@@ -4,8 +4,8 @@ import {
   ApiOperation,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { JWTUserGuard } from 'src/auth/guards/user.guard';
-import { ReturnedTransactionDto } from 'src/transaction/dto/returned-transaction.dto';
+import { JWTUserGuard } from '../auth/guards/user.guard';
+import { ReturnedTransactionDto } from '../transaction/dto/returned-transaction.dto';
 import { NotificationsService } from './notifications.service';
 
 @Controller('notifications')

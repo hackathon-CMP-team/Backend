@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { TransactionService } from 'src/transaction/transaction.service';
-import { UserService } from 'src/user/user.service';
-import { closeInMongodConnection } from 'src/utils/mongoose-in-memory';
-import { testDependingModules } from 'src/utils/test-dependencies';
+import { TransactionService } from '../transaction/transaction.service';
+import { UserService } from '../user/user.service';
+import { closeInMongodConnection } from '../utils/mongoose-in-memory';
+import { testDependingModules } from '../utils/test-dependencies';
 import { NotificationsService } from './notifications.service';
 import {
   NotificationDependingControllers,

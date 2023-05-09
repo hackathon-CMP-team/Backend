@@ -1,7 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { ChildrenService } from 'src/children/children.service';
-import { TransactionService } from 'src/transaction/transaction.service';
-import { UserService } from 'src/user/user.service';
+import { TransactionService } from '../transaction/transaction.service';
 
 @Injectable()
 export class NotificationsService {

@@ -3,6 +3,7 @@ import { TransactionService } from '../transaction/transaction.service';
 import { UserService } from '../user/user.service';
 import { ChildInfoDto } from './dto/child-info.dto';
 import { WalletService } from '../wallet/wallet.service';
+import { ForbiddenCategoriesDto } from './dto/forbidden-categries.dto';
 
 @Injectable()
 export class ChildrenService {
@@ -39,5 +40,21 @@ export class ChildrenService {
 
   async getChildren(phoneNumber: string) {
     return this.userService.getChildren(phoneNumber);
+  }
+
+  async addForbiddenCategories(
+    phoneNumber: string,
+    dto: ForbiddenCategoriesDto,
+  ) {
+    const child = await this.validateChild(phoneNumber, dto.childPhoneNumber);
+    return this.userService.addForbiddenCategories(
+      child.phoneNumber,
+      dto.categories,
+    );
+  }
+
+  async getForbiddenCategories(phoneNumber: string, dto: ChildInfoDto) {
+    const child = await this.validateChild(phoneNumber, dto.childPhoneNumber);
+    return this.userService.getForbiddenCategories(child.phoneNumber);
   }
 }

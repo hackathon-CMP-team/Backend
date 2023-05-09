@@ -54,6 +54,9 @@ export class User {
 
   @Prop({ default: null })
   otpWillExpireAt: number;
+
+  @Prop({})
+  forbiddenCategories: string[];
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

@@ -16,6 +16,18 @@ import {
 
 @Injectable()
 export class UserService {
+  async addForbiddenCategories(phoneNumber: string, categories: string[]) {
+    return this.userModel.findOneAndUpdate(
+      { phoneNumber },
+      { $addToSet: { forbiddenCategories: { $each: categories } } },
+    );
+  }
+
+  async getForbiddenCategories(phoneNumber: string) {
+    return this.userModel
+      .findOne({ phoneNumber })
+      .select({ forbiddenCategories: 1 });
+  }
   constructor(
     @InjectModel(User.name) private readonly userModel: Model<User>,
   ) {}

@@ -13,7 +13,8 @@ export const phoneNumberValidationObject = {
   },
 };
 export class EgyptianPhoneNumberMiddleWare implements NestMiddleware {
-  getReducedEgyptianPhoneNumber(phoneNumber: string) {
+  getReducedEgyptianPhoneNumber(phoneNumber: string | null) {
+    if (!phoneNumber) return null;
     return phoneNumber.replace(/^(\+|0)?(20)?(10\d{8})$/, '$3');
   }
   use(req: any, _: any, next: any) {

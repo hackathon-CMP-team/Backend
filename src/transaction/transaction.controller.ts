@@ -8,6 +8,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
+import { ThrottlerGuard } from '@nestjs/throttler';
 import { JWTParentGuard } from '../auth/guards/parent.guard';
 import { JWTUserGuard } from '../auth/guards/user.guard';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
@@ -22,6 +23,7 @@ import { TransactionService } from './transaction.service';
 
 @ApiTags('transaction')
 @Controller('transaction')
+@UseGuards(ThrottlerGuard)
 export class TransactionController {
   constructor(private readonly transactionService: TransactionService) {}
 

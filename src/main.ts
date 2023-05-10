@@ -3,7 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import { AllExceptionsFilter } from './utils/all-exception-filter';
-
+import helmet from 'helmet';
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
@@ -26,6 +26,7 @@ async function bootstrap() {
       'Origin, X-Requested-With, Content-Type, Accept, Authorization',
   });
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.use(helmet());
   await app.listen(3000);
 }
 bootstrap();

@@ -9,7 +9,7 @@ import {
   ApiTags,
   ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
-import { Throttle } from '@nestjs/throttler';
+import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Types } from 'mongoose';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
@@ -46,6 +46,7 @@ export class AuthController {
   })
   @ApiUnauthorizedResponse({ description: 'wrong credentials' })
   @ApiBadRequestResponse({ description: 'user already logged in' })
+  @UseGuards(ThrottlerGuard)
   @Post('login')
   login(@Body() dto: LoginDto) {
     return this.authService.login(dto);
@@ -75,14 +76,14 @@ export class AuthController {
   @ApiOperation({ summary: 'verify OTP(one time password)' })
   @ApiOkResponse({ description: 'OTP successfully verified' })
   @ApiNotFoundResponse({ description: 'user not found' })
+  @UseGuards(ThrottlerGuard)
   @Post('verify-otp')
-  // @Throttle(3, 5 * 60)
   verifyOTP(@Body() dto: VerifyOTPDto) {
     return this.authService.verifyOTP(dto);
   }
 
   @Post('reset-password')
-  // @Throttle(3, 5 * 60)
+  @UseGuards(ThrottlerGuard)
   resetPassword(@Body() dto: ResetPasswordDto) {
     return this.authService.resetPassword(dto);
   }

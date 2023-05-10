@@ -4,7 +4,7 @@ import { UserService } from '../user/user.service';
 import { ChildInfoDto } from './dto/child-info.dto';
 import { WalletService } from '../wallet/wallet.service';
 import { ForbiddenCategoriesDto } from './dto/forbidden-categries.dto';
-import { UserDocument } from 'src/user/user.schema';
+import { UserDocument } from '../user/user.schema';
 import { Transaction } from 'mongodb';
 
 @Injectable()

@@ -1,7 +1,7 @@
 import { PartialType } from '@nestjs/mapped-types';
 import { ApiProperty } from '@nestjs/swagger';
 import { IsNotEmpty, IsString, ValidateBy } from 'class-validator';
-import { phoneNumberValidationObject } from 'src/utils/middlewares/egyptian-phone-number-format';
+import { phoneNumberValidationObject } from '../../utils/middlewares/egyptian-phone-number-format';
 
 export class ChildInfoDto {
   @IsString()

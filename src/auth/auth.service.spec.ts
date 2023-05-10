@@ -15,6 +15,7 @@ describe('AuthService', () => {
   let service: AuthService;
   let module: TestingModule;
   let userService: UserService;
+  let res = { cookie: jest.fn(), json: jest.fn() };
   let userInfo = {
     name: 'name',
     phoneNumber: '01033304427',
@@ -37,12 +38,11 @@ describe('AuthService', () => {
 
   describe('signup', () => {
     it('should return a token', async () => {
-      const { accessToken } = await service.signup(userInfo);
-      console.log(accessToken);
-      expect(accessToken).toBeDefined();
+      await service.signup(res, userInfo);
+      expect(res.cookie).toHaveBeenCalled();
     });
     it('should throw an error if user already exists', async () => {
-      await expect(service.signup(userInfo)).rejects.toThrow('duplicate');
+      await expect(service.signup(res, userInfo)).rejects.toThrow('duplicate');
     });
     afterAll(async () => {
       const user = await userService.getUserByPhoneNumber(userInfo.phoneNumber);
@@ -51,15 +51,15 @@ describe('AuthService', () => {
   });
   describe('login', () => {
     it('should return a token', async () => {
-      const { accessToken } = await service.login({
+       await service.login(res, {
         phoneNumber: userInfo.phoneNumber,
         password: userInfo.password,
       });
-      expect(accessToken).toBeDefined();
+      expect(res.cookie).toHaveBeenCalled();
     });
     it('must throw error because user is signed in', async () => {
       await expect(
-        service.login({
+        service.login(res, {
           phoneNumber: userInfo.phoneNumber,
           password: userInfo.password,
         }),
@@ -67,7 +67,7 @@ describe('AuthService', () => {
     });
     it('should throw an error if user does not exist', async () => {
       await expect(
-        service.login({
+        service.login(res, {
           phoneNumber: '01033304428',
           password: userInfo.password,
         }),

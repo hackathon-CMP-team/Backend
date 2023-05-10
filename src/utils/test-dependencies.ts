@@ -1,6 +1,7 @@
 import { ConfigModule } from '@nestjs/config';
 import { rootMongooseTestModule } from './mongoose-in-memory';
 import { MailerModule } from '@nestjs-modules/mailer';
+import { ThrottlerModule } from '@nestjs/throttler';
 
 export const testDependingModules = [
   ConfigModule.forRoot(),
@@ -13,5 +14,9 @@ export const testDependingModules = [
         pass: process.env.EMAIL_PASSWORD,
       },
     },
+  }),
+  ThrottlerModule.forRoot({
+    ttl: 60 * 5, // 5 minutes
+    limit: 3,
   }),
 ];

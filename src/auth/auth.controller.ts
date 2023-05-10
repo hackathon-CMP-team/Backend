@@ -12,7 +12,7 @@ import {
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Types } from 'mongoose';
-import { ReturnedUserInfoDto } from 'src/user/dto/returned-user.dto';
+import { ReturnedUserInfoDto } from '../user/dto/returned-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import {

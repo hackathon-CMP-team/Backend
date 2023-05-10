@@ -14,7 +14,7 @@ import {
   ValidateIf,
   ValidationArguments,
 } from 'class-validator';
-import { phoneNumberValidationObject } from 'src/utils/middlewares/egyptian-phone-number-format';
+import { phoneNumberValidationObject } from '../../utils/middlewares/egyptian-phone-number-format';
 import { UserGender, UserRole } from '../user.schema';
 
 export class CreateUserDto {

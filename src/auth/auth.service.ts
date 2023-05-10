@@ -94,9 +94,13 @@ export class AuthService {
    * @returns {Promise<Object>} Object containing the auth information for the new user.
    */
   async signup(res: any, dto: CreateUserDto) {
-    const user = await this.userService.create(dto);
-    await this.sendHelloMail(user);
-    return this.getAuthInfo(res, user);
+    try {
+      const user = await this.userService.create(dto);
+      await this.sendHelloMail(user);
+      return this.getAuthInfo(res, user);
+    } catch (err) {
+      throw new BadRequestException(err.message);
+    }
   }
 
   /**

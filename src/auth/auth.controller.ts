@@ -2,6 +2,7 @@ import { Body, Controller, Post, Req, Res, UseGuards } from '@nestjs/common';
 import {
   ApiBadRequestResponse,
   ApiBearerAuth,
+  ApiCookieAuth,
   ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
@@ -11,6 +12,7 @@ import {
 } from '@nestjs/swagger';
 import { Throttle, ThrottlerGuard } from '@nestjs/throttler';
 import { Types } from 'mongoose';
+import { ReturnedUserInfoDto } from 'src/user/dto/returned-user.dto';
 import { CreateUserDto } from '../user/dto/create-user.dto';
 import { AuthService } from './auth.service';
 import {
@@ -31,25 +33,42 @@ export class AuthController {
   @ApiOperation({ summary: 'Sign up new user' })
   @ApiOkResponse({
     description: 'User successfully signed up',
-    type: ReturnedAuthInfoDto,
+    type: ReturnedUserInfoDto,
+    headers: {
+      'Set-Cookie': {
+        description: 'JWT token',
+        schema: {
+          type: 'string',
+        },
+      },
+    },
   })
   @ApiBadRequestResponse({ description: "Can't create user" })
   @Post('signup')
-  signup(@Body() dto: CreateUserDto) {
-    return this.authService.signup(dto);
+  signup(@Res() res: any, @Body() dto: CreateUserDto) {
+    return this.authService.signup(res, dto);
   }
 
   @ApiOperation({ summary: 'login to the website' })
   @ApiOkResponse({
     description: 'User successfully logged in',
-    type: ReturnedAuthInfoDto,
+    type: ReturnedUserInfoDto,
+    headers: {
+      'Set-Cookie': {
+        description: 'JWT token',
+        schema: {
+          type: 'string',
+        },
+      },
+    },
   })
+  @ApiCookieAuth()
   @ApiUnauthorizedResponse({ description: 'wrong credentials' })
   @ApiBadRequestResponse({ description: 'user already logged in' })
   @UseGuards(ThrottlerGuard)
   @Post('login')
-  login(@Body() dto: LoginDto) {
-    return this.authService.login(dto);
+  login(@Res() res: Express.Response, @Body() dto: LoginDto) {
+    return this.authService.login(res, dto);
   }
 
   @ApiOperation({ summary: 'logout from the website' })

@@ -67,11 +67,17 @@ export class AuthService {
    * @param {UserDocument} user - The user to get the auth information for.
    * @returns {Object} Object containing the access token and user information.
    */
-  private async getAuthInfo(user: UserDocument): Promise<ReturnedAuthInfoDto> {
+  private async getAuthInfo(
+    res: any,
+    user: UserDocument,
+  ): Promise<ReturnedAuthInfoDto> {
     const { accessToken } = await this.getAuthToken(user);
     await this.userService.saveAcessToken(accessToken, user._id);
-    return {
-      accessToken,
+    res.cookie('access_token', accessToken, {
+      httpOnly: true,
+      maxAge: 1000 * 60 * 60 * 20,
+    });
+    return res.json({
       user: {
         name: user.name,
         phoneNumber: user.phoneNumber,
@@ -79,7 +85,7 @@ export class AuthService {
         age: this.calculateAge(user.dateOfBirth),
         gender: user.gender,
       },
-    };
+    });
   }
 
   /**
@@ -87,10 +93,10 @@ export class AuthService {
    * @param {CreateUserDto} dto - The DTO containing user information.
    * @returns {Promise<Object>} Object containing the auth information for the new user.
    */
-  async signup(dto: CreateUserDto) {
+  async signup(res: any, dto: CreateUserDto) {
     const user = await this.userService.create(dto);
     await this.sendHelloMail(user);
-    return this.getAuthInfo(user);
+    return this.getAuthInfo(res, user);
   }
 
   /**
@@ -125,7 +131,10 @@ export class AuthService {
    * @throws {BadRequestException} - Throws an error if the user is already logged in.
    * @throws {UnauthorizedException} - Throws an error if the password is invalid.
    */
-  async login(dto: LoginDto): Promise<ReturnedAuthInfoDto> {
+  async login(
+    res: Express.Response,
+    dto: LoginDto,
+  ): Promise<ReturnedAuthInfoDto> {
     const user = await this.userService.getUserByPhoneNumber(dto.phoneNumber);
     if (user.accessToken != null && user.accessTokenWillExpireAt > Date.now())
       throw new BadRequestException('user already logged in');
@@ -134,7 +143,7 @@ export class AuthService {
       user.password,
     );
     if (!validPassword) throw new UnauthorizedException('wrong password');
-    return this.getAuthInfo(user);
+    return this.getAuthInfo(res, user);
   }
 
   /**

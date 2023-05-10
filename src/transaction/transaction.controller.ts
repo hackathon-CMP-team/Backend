@@ -12,6 +12,7 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { JWTParentGuard } from '../auth/guards/parent.guard';
 import { JWTUserGuard } from '../auth/guards/user.guard';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
+import { PayBillDto } from './dto/pay-bill.dto';
 import { RequestMoneyDto } from './dto/request.dto';
 import { ResponseToRequestDto } from './dto/resonse-to-request.dto';
 import { ReturnedTransactionDto } from './dto/returned-transaction.dto';
@@ -67,6 +68,18 @@ export class TransactionController {
   @Post('payment')
   buyUsingVirtualCard(@Body() dto: BuyUsingVirtualCardDto) {
     return this.transactionService.buyUsingVirtualCard(dto);
+  }
+
+  @ApiOperation({ summary: 'pay bill using the application' })
+  @ApiOkResponse({ description: 'operation successfully done' })
+  @ApiUnauthorizedResponse({
+    description: 'user not logged in, or user is a child',
+  })
+  @ApiBadRequestResponse({ description: 'not enough balance' })
+  @Post('bill')
+  @UseGuards(JWTParentGuard)
+  payBill(@Req() req: any, @Body() dto: PayBillDto) {
+    return this.transactionService.payBill(req.user.phoneNumber, dto);
   }
 
   @ApiOperation({ summary: 'withdraw money from the wallet' })

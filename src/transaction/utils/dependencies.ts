@@ -5,6 +5,8 @@ import { TransactionController } from '../transaction.controller';
 import { TransactionService } from '../transaction.service';
 import {
   Transaction,
+  TransactionBills,
+  TransactionBillsSchema,
   TransactionBuyUsingVirtualVisa,
   TransactionBuyUsingVirtualVisaSchema,
   transactionRequestMoney,
@@ -39,6 +41,10 @@ export const TransactionDiscriminators = [
   {
     name: transactionRequestMoney.name,
     schema: transactionRequestMoneySchema,
+  },
+  {
+    name: TransactionBills.name,
+    schema: TransactionBillsSchema,
   },
 ];
 

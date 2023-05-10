@@ -204,7 +204,7 @@ export class UserService {
    * @returns A Promise that resolves to an object containing a success status if the password reset is successful.
    * @throws NotFoundException if the user with the provided phone number is not found.
    * @throws UnauthorizedException if the OTP is invalid or expired.
-  */
+   */
   async resetPassword(dto: ResetPasswordDto) {
     const user = await this.userModel.findOne({
       phoneNumber: dto.phoneNumber,
@@ -251,5 +251,20 @@ export class UserService {
     return this.userModel
       .findOne({ phoneNumber })
       .select({ forbiddenCategories: 1 });
+  }
+
+  /**
+   * check if the user has enough balance to do the operation
+   * @param phoneNumber phone number of the user
+   * @param amount amount of balance to be checked
+   * @returns true if the user has enough balance to do the operation
+   * @throws BadRequestException if the user does not have enough balance to do the operation
+   */
+  async checkValidBalance(phoneNumber: string, amount: number) {
+    const user = await this.userModel.findOne({ phoneNumber });
+    if (user.balance < amount) {
+      throw new BadRequestException('not enough balance to do the operation');
+    }
+    return true;
   }
 }

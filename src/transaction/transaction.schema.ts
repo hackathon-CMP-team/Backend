@@ -1,6 +1,12 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types } from 'mongoose';
 
+export enum BillType {
+  ELECTRICITY = 'electricity',
+  WATER = 'water',
+  GAS = 'gas',
+}
+
 @Schema({ discriminatorKey: 'type' })
 export class Transaction {
   type: string;
@@ -72,6 +78,15 @@ export class TransactionVirtualVisa extends Transaction {
 }
 
 @Schema()
+export class TransactionBills extends Transaction {
+  @Prop({ required: true, enum: BillType })
+  billType: BillType;
+
+  @Prop({ required: true })
+  billNumber: string;
+}
+
+@Schema()
 export class TransactionWithdraw extends Transaction {}
 
 export const TransactionSchema = SchemaFactory.createForClass(Transaction);
@@ -84,7 +99,8 @@ export const TransactionWithdrawSchema =
   SchemaFactory.createForClass(TransactionWithdraw);
 export const TransactionBuyUsingVirtualVisaSchema =
   SchemaFactory.createForClass(TransactionBuyUsingVirtualVisa);
-
+export const TransactionBillsSchema =
+  SchemaFactory.createForClass(TransactionBills);
 export const transactionRequestMoneySchema = SchemaFactory.createForClass(
   transactionRequestMoney,
 );

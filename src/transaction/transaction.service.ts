@@ -8,6 +8,7 @@ import { Model, Query, Types } from 'mongoose';
 import { UserRole } from '../user/user.schema';
 import { UserService } from '../user/user.service';
 import { BuyUsingVirtualCardDto } from './dto/buy-using-vv.dto';
+import { PayBillDto } from './dto/pay-bill.dto';
 import { RequestMoneyDto } from './dto/request.dto';
 import { ResponseToRequestDto } from './dto/resonse-to-request.dto';
 import { VirtualCardDto } from './dto/virtual-card.dto';
@@ -20,6 +21,7 @@ import {
   TransactionBuyUsingVirtualVisa,
   transactionRequestMoney,
   RequestMoneyStatus,
+  TransactionBills,
 } from './transaction.schema';
 
 @Injectable()
@@ -37,6 +39,8 @@ export class TransactionService {
     private readonly transactionVirtualVisaModel: Model<TransactionVirtualVisa>,
     @InjectModel(TransactionBuyUsingVirtualVisa.name)
     private readonly transactionBuyUsingVirtualVisaModel: Model<TransactionBuyUsingVirtualVisa>,
+    @InjectModel(TransactionBills.name)
+    private readonly transactionBillsModel: Model<TransactionBills>,
     private readonly userService: UserService,
   ) {}
 
@@ -419,5 +423,17 @@ export class TransactionService {
         { receiverPhone: { $in: childPhones } },
       ],
     });
+  }
+
+  async payBill(phoneNumber: any, dto: PayBillDto) {
+    await this.userService.reduceBalance(phoneNumber, dto.amount);
+    await this.transactionBillsModel.create({
+      amount: dto.amount,
+      billNumber: dto.billNumber,
+      billType: dto.billType,
+      date: Date.now(),
+      userPhone: phoneNumber,
+    });
+    return { status: 'success' };
   }
 }

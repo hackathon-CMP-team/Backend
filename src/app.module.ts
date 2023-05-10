@@ -24,10 +24,10 @@ import { LoggerMiddleware } from './utils/middlewares/logger';
         },
       },
     }),
-    // ThrottlerModule.forRoot({
-    //   ttl: 60,
-    //   limit: 3,
-    // }),
+    ThrottlerModule.forRoot({
+      ttl: 60 * 5, // 5 minutes
+      limit: 3,
+    }),
     UserModule,
     AuthModule,
     TransactionModule,
